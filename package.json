@@ -1,0 +1,35 @@
+{
+  "name": "weecloud-react",
+  "version": "0.0.1",
+  "description": "weecloud clone written with reactjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "weechat",
+    "weecloud",
+    "react",
+    "chat",
+    "irc"
+  ],
+  "author": "Rok Garbas",
+  "license": "MIT",
+  "homepage": "https://github.com/garbas/weecloud-react",
+  "bugs": {
+    "url": "https://github.com/garbas/weecloud-react/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/garbas/weecloud-react.git"
+  },
+  "dependencies": {
+    "connect": "^2.14.4",
+    "connect-flash": "^0.1.1",
+    "connect-redirection": "0.0.1",
+    "connect-route": "^0.1.4",
+    "optimist": "^0.6.1",
+    "passport": "^0.2.0",
+    "passport-local": "^1.0.0"
+  }
+}
