@@ -1,0 +1,5 @@
+
+require([
+], function() {
+  alert('WORKS!');
+});
