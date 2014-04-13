@@ -28,7 +28,7 @@
     "connect-flash": "^0.1.1",
     "connect-redirection": "0.0.1",
     "connect-route": "^0.1.4",
-    "optimist": "^0.6.1",
+    "yargs": "^1.0.15",
     "passport": "^0.2.0",
     "passport-local": "^1.0.0"
   }

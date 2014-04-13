@@ -1,5 +1,5 @@
-var optimist = require('optimist'),
-    argv = optimist
+var yargs = require('yargs'),
+    argv = yargs
       .usage('$0 [options]')
       .alias('p', 'port')
         .default('p', 8000)
@@ -9,7 +9,7 @@ var optimist = require('optimist'),
       .argv
 
 if (argv.help) {
-    optimist.showHelp();
+    yargs.showHelp();
     process.exit(0);
 }
 
