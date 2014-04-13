@@ -102,7 +102,6 @@ var express = require('express'),
     app = express();
 
 app
-  .set('view engine', 'jade')
   .use('/bower_components', express.static(__dirname + '/bower_components'))
   .use('/static', express.static(__dirname + '/static'))
   .use(bodyParser())
@@ -113,7 +112,12 @@ app
   }))
   .use(flash())
   .use(passport.initialize())
-  .use(passport.session());
+  .use(passport.session())
+  .use(function(req, res, next) {
+    app.locals.request = req;
+    app.locals.response = req;
+    next();
+  });
 
 app.locals.title = argv.title;
 
@@ -122,37 +126,77 @@ app.locals.title = argv.title;
 //  --- ROUTES ---
 //
 
-var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn,
+var React = require('react'),
+    ReactRouter = require('react-router-component'),
+    App = require('./static/app'),
+    url = require('url'),
+    ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn,
     ensureLoggedOut = require('connect-ensure-login').ensureLoggedOut;
     
-// login
+
+var renderApp = function(req, res, next) {
+  try {
+
+    var content = React.renderComponentToString(App({
+      path: url.parse(req.url).pathname
+    }))
+
+    res.send(
+      '<!doctype html>' +
+      '<html>' +
+      ' <head>' +
+      '  <title>' + argv.title + '</title>' +
+      '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />' +
+      '  <link rel="stylesheet" content="/bower_components/bootstrap/dist/css/bootstrap.min.css" />' +
+      ' </head>' +
+      ' <body>' +
+      '  <div class="container">' + content + '</div>' +
+      ' </body>' +
+      '</html>')
+
+  } catch(err) {
+    return next(err)
+  }
+};
+
 app.route('/login')
-  .get(
-    ensureLoggedOut('/'),
-    function(req, res) {
-      res.render('login', { messages: req.flash('error') });
-    })
-  .post(passport.authenticate('local', {
+  .get(ensureLoggedOut('/'), renderApp)
+  .post(ensureLoggedOut('/'), passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
   }));
 
-// dashboard
-app.route('/')
-  .get(
-    ensureLoggedIn('/login'),
-    function(req, res) {
-      res.render('dashboard', { user: req.user });
-    });
+app.route('/logout')
+  .get(ensureLoggedIn('/'), function(req, res, next) {
+    req.logout();
+    res.redirect('/');
+  });
 
-// chat
-app.route('/chat')
-  .get(
-    ensureLoggedIn('/login'),
-    function(req, res) {
-      console.log('chatting');
-    });
+app.route('/')
+  .get(ensureLoggedIn('/login'), renderApp)
+
+    //  .post(passport.authenticate('local', {
+    //    successRedirect: '/',
+    //    failureRedirect: '/login',
+    //    failureFlash: true
+    //  }));
+    //
+    //// dashboard
+    //app.route('/')
+    //  .get(
+    //    ensureLoggedIn('/login'),
+    //    function(req, res) {
+    //      res.render('dashboard', { user: req.user });
+    //    });
+    //
+    //// chat
+    //app.route('/chat')
+    //  .get(
+    //    ensureLoggedIn('/login'),
+    //    function(req, res) {
+    //      console.log('chatting');
+    //    });
 
 
 
