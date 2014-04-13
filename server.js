@@ -39,6 +39,22 @@ var yargs = require('yargs')
     alias: 'P',
     default: 8000
   })
+  .options('relay-host', {
+    describe: 'Relay host.',
+    default: 'localhost'
+  })
+  .options('relay-port', {
+    describe: 'Relayt port.',
+    default: '8888'
+  })
+  .options('relay-password', {
+    describe: 'Relay password.',
+    default: ''
+  })
+  .options('relay-ssl', {
+    describe: 'Relay ssl.',
+    default: false
+  })
   .options('verbose', {
     describe: 'Display more verbose.',
     alias: 'v',
@@ -139,7 +155,7 @@ var renderApp = function(req, res, next) {
 
     var content = React.renderComponentToString(App({
       path: url.parse(req.url).pathname
-    }))
+    }));
 
     res.send(
       '<!doctype html>' +
@@ -149,8 +165,8 @@ var renderApp = function(req, res, next) {
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />' +
       '  <link rel="stylesheet" content="/bower_components/bootstrap/dist/css/bootstrap.min.css" />' +
       ' </head>' +
-      ' <body>' +
-      '  <div class="container">' + content + '</div>' +
+      ' <body>' + content +
+      '  <script data-main="/static/main.js" src="bower_components/requirejs/require.js"></script>' +
       ' </body>' +
       '</html>')
 
@@ -176,28 +192,6 @@ app.route('/logout')
 app.route('/')
   .get(ensureLoggedIn('/login'), renderApp)
 
-    //  .post(passport.authenticate('local', {
-    //    successRedirect: '/',
-    //    failureRedirect: '/login',
-    //    failureFlash: true
-    //  }));
-    //
-    //// dashboard
-    //app.route('/')
-    //  .get(
-    //    ensureLoggedIn('/login'),
-    //    function(req, res) {
-    //      res.render('dashboard', { user: req.user });
-    //    });
-    //
-    //// chat
-    //app.route('/chat')
-    //  .get(
-    //    ensureLoggedIn('/login'),
-    //    function(req, res) {
-    //      console.log('chatting');
-    //    });
-
 
 
 //
@@ -205,16 +199,47 @@ app.route('/')
 //
 
 var server = require('http').createServer(app),
-   io = require('socket.io').listen(server);
+    io = require('socket.io').listen(server);
 
 server
   .listen(argv.port, function() {
     console.log(argv.title + ' started at: http://localhost:' + argv.port);
   });
 
-io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
+
+//
+// --- SOCKET.IO ---
+//
+
+var weechat = require('weechat'),
+    util = require('util'),
+    buffers = 'hdata buffer:%s number,short_name,title,local_variables',
+    relay = weechat.connect(
+      argv['relay-host'],
+      argv['relay-port'],
+      argv['relay-passport'],
+      argv['relay-ssl'],
+      function() {
+        console.log('Connected to ' +
+                    argv['relay-host'] + ':' +
+                    argv['relay-port'] + '!');
+      }
+    );
+
+io.sockets.on('connection', function(socket) {
+
+
+  socket.on('connect', function(data, cb) {
+    relay.send(util.format(buffers, 'gui_buffers(*)'), function(buffers) {
+      if (!Array.isArray(buffers)) {
+        buffers = [ buffers ];
+      }
+      cb(buffers);
+    });
   });
+
+  relay.on(function() {
+    socket.emit('change', arguments); 
+  });
+
 });

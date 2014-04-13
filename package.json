@@ -38,6 +38,7 @@
     "react": "^0.10.0",
     "react-async": "^0.9.1",
     "react-router-component": "^0.18.2",
-    "amdefine": "^0.1.0"
+    "amdefine": "^0.1.0",
+    "weechat": "0.0.17"
   }
 }

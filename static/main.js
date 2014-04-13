@@ -3,7 +3,8 @@ requirejs.config({
     'domready': '/bower_components/requirejs-domready/domReady',
     'react' : '/bower_components/react/react-with-addons',
     'react-async' : '/bower_components/react-async/react-async',
-    'react-router-component' : '/bower_components/react-router-component/react-router-component'
+    'react-router-component' : '/bower_components/react-router-component/react-router-component',
+    'socket.io' : '/socket.io/socket.io'
   }
 });
 
@@ -16,7 +17,7 @@ require([
   domready(function() {
     React.renderComponent(App({
       path: window.location.pathname
-    }), document.body.childNodes[0]);
+    }), document.body);
   });
 
 });
