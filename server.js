@@ -144,7 +144,7 @@ app.locals.title = argv.title;
 
 var React = require('react'),
     ReactRouter = require('react-router-component'),
-    App = require('./static/app'),
+    AppRouter = require('./static/router'),
     url = require('url'),
     ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn,
     ensureLoggedOut = require('connect-ensure-login').ensureLoggedOut;
@@ -153,9 +153,9 @@ var React = require('react'),
 var renderApp = function(req, res, next) {
   try {
 
-    var content = React.renderComponentToString(App({
-      path: url.parse(req.url).pathname
-    }));
+    var content = React.renderComponentToString(
+      AppRouter({ path: url.parse(req.url).pathname })
+    );
 
     res.send(
       '<!doctype html>' +
@@ -212,8 +212,6 @@ server
 //
 
 var weechat = require('weechat'),
-    util = require('util'),
-    buffers = 'hdata buffer:%s number,short_name,title,local_variables',
     relay = weechat.connect(
       argv['relay-host'],
       argv['relay-port'],
@@ -228,18 +226,128 @@ var weechat = require('weechat'),
 
 io.sockets.on('connection', function(socket) {
 
+  var send = function(command, cb) {
+    console.log('RELAY: ' + command);
+    relay.send(command, function() { cb.apply(this, arguments); });
+  };
 
-  socket.on('connect', function(data, cb) {
-    relay.send(util.format(buffers, 'gui_buffers(*)'), function(buffers) {
-      if (!Array.isArray(buffers)) {
-        buffers = [ buffers ];
+  relay.on(function() {
+    socket.emit('events', arguments); 
+  });
+
+  relay.on('error', function(error) {
+    console.log('RELAY: ' + error.code + ' - ' + error.message);
+  });
+
+  // http://www.weechat.org/files/doc/devel/weechat_relay_protocol.en.html#commands
+
+  socket.on('init', function(args, cb) {
+    var password = args.password ? ' password=' + args.password : '',
+        compression = args.compression ? ' compression=' + args.compression: '';
+
+    if (args.compression && ['zlib', 'off'].indexOf(args.compression) === -1) {
+      console.error('init command failed due compression set to "' +
+                    args.compression + '", allowed values are "gzip" or "off".');
+    } else {
+      send('init'  + password + compression, cb);
+    }
+  });
+
+  socket.on('hdata', function(args, cb) {
+    var id = args.id ? args.id + ' ' : '',
+        keys = args.keys ? ' ' + (args.keys || []).join(',') : '';
+
+    if (!args.path) {
+      console.error('hdata command failed due to missing path argument.');
+    } else {
+      send(id + 'hdata '  + args.path + keys, cb);
+    }
+  });
+
+  socket.on('info', function(args, cb) {
+    var id = args.id + ' ' || '';
+
+    if (!args.name) {
+      console.error('info command failed due to missing name argument.');
+    } else {
+      send(id + 'info '  + name, cb);
+    }
+  });
+
+  socket.on('infolist', function(args, cb) {
+    var id = args.id + ' ' || '',
+        pointer = args.pointer + ' ' || '',
+        arguments = args.arguments + ' ' || '';
+
+    if (!args.name) {
+      console.error('infolist command failed due to missing name argument.');
+    } else {
+      send(id + 'infolist '  + name + pointer  + arguments, cb);
+    }
+  });
+
+  socket.on('nicklist', function(args, cb) {
+    var id = args.id + ' ' || '',
+        buffer = args.buffer + ' ' || '';
+
+    send(id + 'nicklist'  + buffer, cb);
+  });
+
+  socket.on('input', function(args, cb) {
+    var buffer = args.buffer + ' ' || '';
+
+    if (!args.buffer) {
+      console.error('input command failed due to missing buffer argument.');
+    } else if (!args.data) {
+      console.error('input command failed due to missing data argument.');
+    } else {
+      send('input ' + buffer + ' ' + input, cb);
+    }
+  });
+
+  ['sync', 'desync'].forEach(function(command) {
+    socket.on(command, function(args, cb) {
+      var buffers = '', options = '';
+
+      if (args.buffers) {
+        if (!Array.isArray(args.buffers)) {
+          buffers = args.buffers;
+        } else {
+          buffers = args.buffers.join(',');
+        }
       }
-      cb(buffers);
+      if (buffers) {
+        buffers = ' ' + buffers;
+      }
+
+      if (args.options) {
+        if (!Array.isArray(args.options)) {
+          optins = args.options;
+        } else {
+          options = args.options.join(',');
+        }
+      }
+      if (options) {
+        options = ' ' + options;
+      }
+
+      send(command + buffers + options, cb);
     });
   });
 
-  relay.on(function() {
-    socket.emit('change', arguments); 
+  socket.on('test', function(args, cb) {
+    send('test', cb);
+  });
+
+  socket.on('ping', function(args, cb) {
+    if (args) {
+      args = ' ' + args;
+    }
+    send('test' + args, cb);
+  });
+
+  socket.on('quit', function(args, cb) {
+    send('quit', cb);
   });
 
 });

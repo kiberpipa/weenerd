@@ -11,11 +11,11 @@ requirejs.config({
 require([
   'domready',
   'react',
-  './app'
-], function(domready, React, App, undefined) {
+  './router'
+], function(domready, React, Router, undefined) {
 
   domready(function() {
-    React.renderComponent(App({
+    React.renderComponent(Router({
       path: window.location.pathname
     }), document.body);
   });
