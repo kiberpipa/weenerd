@@ -22,7 +22,7 @@ define([
                     self.props.openBuffer(uid);
                     e.preventDefault();
                   }
-                }, buffer.info.short_name)
+                }, buffer.info.full_name)
               )
             );
           })

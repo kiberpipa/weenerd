@@ -25,8 +25,54 @@ define([
       self.socket = SocketIO.connect();
 
       // listen to all events from relay
-      self.socket.on('events', function() {
-        console.log(arguments);
+      self.socket.on('events', function(event) {
+        var buffers = self.state.buffers,
+            opened = self.state.opened,
+            active = self.state.active;
+
+        if (event[1] === '_buffer_line_added') {
+          console.log('_buffer_line_added');
+          if (buffers[event[0].buffer]) {
+            buffers[event[0].buffer].messages.push(event[0]);
+            self.setState({ buffers: buffers });
+          }
+
+        } else if (event[1] === '_buffer_opened') {
+          console.log('_buffer_opened');
+          if (Object.keys(self.state.buffers).indexOf(event[0].pointers[0]) === -1) {
+            buffers[event[0].pointers[0]] = { info: event[0], messages: [] };
+            self.setState({ buffers: buffers });
+          }
+
+        } else if (event[1] === '_buffer_closing') {
+          console.log('_buffer_closing');
+          if (Object.keys(self.state.buffers).indexOf(event[0].pointers[0]) !== -1) {
+            delete self.state.buffers[event[0].pointers[0]];
+
+            if (event[0].pointers[0] === active) {
+              active = undefined;
+            }
+
+            if (opened.indexOf(event[0].pointers[0]) !== -1) {
+              opened.splice(opened.indexOf(event[0].pointers[0]), 1);
+            }
+
+            self.setState({
+              active: active,
+              buffers: buffers,
+              opened: opened
+            });
+          }
+
+        } else if (event[1] === '_buffer_title_changed') {
+          console.log('_buffer_title_changed');
+          buffers[event[0].pointers[0]].info.title = event[0].title;
+          self.setState({ buffers: buffers });
+
+        } else {
+          console.log('EVENT MISSES:');
+          console.log(event);
+        }
       });
 
       // get all buffers 
