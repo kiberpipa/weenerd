@@ -107,7 +107,7 @@ define([
               path: 'buffer:' + uid + '/own_lines/last_line(-100)/data'
             }, function(messages) {
               buffers = self.state.buffers;
-              buffers[uid].messages = messages;
+              buffers[uid].messages = messages.reverse();
               self.setState({ buffers: buffers });
             });
             
