@@ -77,7 +77,8 @@ define([
 
       // get all buffers 
       self.socket.emit('hdata', {
-        path: 'buffer:gui_buffers(*)'
+        path: 'buffer:gui_buffers(*)',
+        keys: ['number', 'short_name', 'title', 'local_variables']
       }, function(buffers) {
         var buffersState = {};
         buffers.forEach(function(buffer) {
