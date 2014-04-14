@@ -22,13 +22,14 @@ define([
 
     // see http://blog.vjeux.com/2013/javascript/scroll-position-with-react.html
     componentWillUpdate: function() {
-      var node = this.getDOMNode();
+      // TODO: ugly as fuck, get by ID
+      var node = this.getDOMNode().children[0];
       this.shouldScrollBottom = node.scrollTop + node.offsetHeight === node.scrollHeight;
     },
     
     componentDidUpdate: function() {
       if (this.shouldScrollBottom) {
-        var node = this.getDOMNode();
+        var node = this.getDOMNode().children[0];
         node.scrollTop = node.scrollHeight;
       }
     },
