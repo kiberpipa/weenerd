@@ -43,7 +43,7 @@ define([
         } else if (event[1] === '_buffer_opened') {
           console.log('_buffer_opened');
           if (Object.keys(self.state.buffers).indexOf(event[0].pointers[0]) === -1) {
-            buffers[event[0].pointers[0]] = { info: event[0], messages: [] };
+            buffers[event[0].pointers[0]] = { info: event[0], messages: [], nicklist: [] };
             self.setState({ buffers: buffers });
           }
 
