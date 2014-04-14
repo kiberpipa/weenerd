@@ -215,7 +215,7 @@ var weechat = require('weechat'),
     relay = weechat.connect(
       argv['relay-host'],
       argv['relay-port'],
-      argv['relay-passport'],
+      argv['relay-password'],
       argv['relay-ssl'],
       function() {
         console.log('Connected to ' +
