@@ -20,14 +20,13 @@ define([
 
     // see http://blog.vjeux.com/2013/javascript/scroll-position-with-react.html
     componentWillUpdate: function() {
-      // TODO: ugly as fuck, get by ID
-      var node = this.getDOMNode().children[0];
+      var node = this.getDOMNode().getElementsByClassName('buffer-window')[0];
       this.shouldScrollBottom = node.scrollTop + node.offsetHeight === node.scrollHeight;
     },
     
     componentDidUpdate: function() {
       if (this.shouldScrollBottom) {
-        var node = this.getDOMNode().children[0];
+        var node = this.getDOMNode().getElementsByClassName('buffer-window')[0];
         node.scrollTop = node.scrollHeight;
       }
     },
@@ -40,7 +39,7 @@ define([
       return React.DOM.div({className: "row " + (this.props.isActive ? "" : " hidden")}, [
           React.DOM.div({className: "list-group col-lg-10"}, [
             React.DOM.h3({ key: 'title' }, name + ": " + buffer.info.title),
-            React.DOM.ul({
+            React.DOM.ul({className: "buffer-window",
                          key: "listgroup",
                          style: {"overflow-y": "auto",
                                  "overflow-x": "hidden"}}, 
