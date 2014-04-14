@@ -165,21 +165,17 @@ define([], function(undefined) {
     if (!parts) return '';
 
     return parts.map(function(part) {
-      var html,
-          linkExp = /((https?\:\/\/|www\.)\S+\.\S+)/ig,
-          fg = ('' + part.fg).replace(/ /, ''),
-          bg = ('' + part.bg).replace(/ /, '');
+      var linkExp = /((https?\:\/\/|www\.)\S+\.\S+)/ig;
  
-      html = '<span>' + part.text.replace(/ /g, '&nbsp;') + '</span>';
-
-      (html.match(linkExp) || []).forEach(function(link) {
+      (part.text.match(linkExp) || []).forEach(function(link) {
         var original = link;
         if (link.match(/^www/i)) link = 'http://' + link;
 
-        html = html.replace(original, '<a href="' + link + '" target="_blank">' + original + '</a>');
+        part.text = part.text.replace(original, '<a href="' + link + '" target="_blank">' + original + '</a>');
       });
-
-      return html;
+      
+      // TODO: preserve spaces
+      return part.text;
     }).join('');
   }
 
