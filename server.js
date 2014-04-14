@@ -288,10 +288,10 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('nicklist', function(args, cb) {
-    var id = args.id + ' ' || '',
-        buffer = args.buffer + ' ' || '';
+    var id = args.id ? args.id + ' ' : '',
+        buffer = ' ' + args.buffer || '';
 
-    send(id + 'nicklist'  + buffer, cb);
+    send(id + 'nicklist' + buffer, cb);
   });
 
   socket.on('input', function(args, cb) {

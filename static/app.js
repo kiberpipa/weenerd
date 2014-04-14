@@ -18,6 +18,9 @@ define([
         active: undefined
       };
     },
+    
+   
+
 
     componentDidMount: function() {
       var self = this;
@@ -83,7 +86,7 @@ define([
         var buffersState = {};
         buffers.forEach(function(buffer) {
           if (['channel', 'private'].indexOf(buffer.local_variables.type) !== -1) {
-            buffersState[buffer.pointers[0]] = { info: buffer, messages: [] };
+            buffersState[buffer.pointers[0]] = { info: buffer, messages: [], nicklist: [] };
           }
         });
         self.setState({ buffers: buffersState });
@@ -91,7 +94,8 @@ define([
     },
 
     componentDidUpdate: function(prevProps, prevState) {
-      var self = this;
+      var self = this,
+          buffers;
 
       // open buffers
       if (prevState.opened !== self.state.opened) {
@@ -100,10 +104,20 @@ define([
           // get initial messages for buffer
           if (prevState.opened.indexOf(uid) === -1) {
             self.socket.emit('hdata', {
-              path: 'buffer:' + uid + '/own_lines/last_line(-10000)/data'
+              path: 'buffer:' + uid + '/own_lines/last_line(-100)/data'
             }, function(messages) {
-              var buffers = self.state.buffers;
+              buffers = self.state.buffers;
               buffers[uid].messages = messages;
+              self.setState({ buffers: buffers });
+            });
+            
+            self.socket.emit("nicklist", {buffer: uid}, function (nicks) {
+              buffers = self.state.buffers;
+              buffers[uid].nicklist = nicks.filter(function (nick) {
+                return (nick.group === 0 && nick.level === 0);
+              }).map(function (nick) {
+                  return nick.name;
+            });
               self.setState({ buffers: buffers });
             });
           }
@@ -127,13 +141,13 @@ define([
     render: function() {
       var self = this;
       return (
-        React.DOM.div({}, [
+        React.DOM.div({className: "row", style: {height: "100%"}}, [
           Dashboard({
-            key: 'dahsboard',
+            key: 'dashboard',
             buffers: self.state.buffers,
             openBuffer: self.openBuffer
           }),
-          React.DOM.div({ key: 'buffers' },
+          React.DOM.div({ key: 'buffers', className: "col-lg-10"},
             self.state.opened.map(function(uid) {
               return Buffer({
                 isActive: self.state.active === uid,

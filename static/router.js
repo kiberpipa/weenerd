@@ -13,7 +13,7 @@ define([
 
     render: function() {
       return (
-        React.DOM.div({ className: 'container' },
+        React.DOM.div({ className: 'container-fluid' },
           Router.Locations({ path: this.props.path }, [
             Router.Location({ path: '/', handler: App }),
             Router.Location({ path: '/login', handler: Login })

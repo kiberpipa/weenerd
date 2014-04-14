@@ -24,6 +24,7 @@
   "dependencies": {
     "bootstrap": "~3.1.1",
     "react": "~0.10.0",
+    "moment": "~2.6.0",
     "requirejs": "~2.1.11",
     "requirejs-domready": "~2.0.1",
     "react-router-component": "~0.18.0"

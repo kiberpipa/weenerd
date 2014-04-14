@@ -36,6 +36,7 @@
     "socket.io": "^0.9.16",
     "envify": "^1.2.1",
     "react": "^0.10.0",
+    "moment": "^2.6.0",
     "react-async": "^0.9.1",
     "react-router-component": "^0.18.2",
     "amdefine": "^0.1.0",
