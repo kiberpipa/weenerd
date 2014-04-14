@@ -1,11 +1,9 @@
-
 An attempt to build WeeChat Relay Client using:
 
  - Node: http://nodejs.org
  - Connect/Express: http://www.senchalabs.org/connect
  - Passport: http://passportjs.org
  - SocketIO: http://socket.io
- - Backbone: http://backbonejs.org
  - React: http://facebook.github.io/react
 
 
