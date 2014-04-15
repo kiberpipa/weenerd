@@ -21,13 +21,13 @@ define([
 
     // see http://blog.vjeux.com/2013/javascript/scroll-position-with-react.html
     componentWillUpdate: function() {
-      var node = this.getDOMNode().getElementsByClassName('buffer-window')[0];
+      var node = this.getDOMNode().getElementsByClassName('buffer-messages')[0];
       this.shouldScrollBottom = node.scrollTop + node.offsetHeight === node.scrollHeight;
     },
     
     componentDidUpdate: function() {
       if (this.shouldScrollBottom) {
-        var node = this.getDOMNode().getElementsByClassName('buffer-window')[0];
+        var node = this.getDOMNode().getElementsByClassName('buffer-messages')[0];
         node.scrollTop = node.scrollHeight;
       }
     },
@@ -37,24 +37,20 @@ define([
           self = this,
           name = buffer.info.short_name;
       // TODO: when updating topic, short_name has a funny name 
-      return React.DOM.div({className: "row " + (this.props.isActive ? "" : " hidden")}, [
+      return React.DOM.div({ className: this.props.isActive ? " buffer-active" : "buffer-unactive" }, [
           React.DOM.div({className: "list-group col-lg-10"}, [
-            React.DOM.h3({ key: 'title' }, name + ": " + buffer.info.title),
-            React.DOM.ul({className: "buffer-window",
-                         key: "listgroup",
-                         style: {"overflow-y": "auto",
-                                 "overflow-x": "hidden",
-                                 height: "80vh"
-                         }}, 
+            React.DOM.h3({ key: 'title', className: 'buffer-title', style: this.props.layout.bufferTitle || {} }, name + ": " + buffer.info.title),
+            React.DOM.ul({ key: "listgroup", className: 'buffer-messages',
+                           style: this.props.layout.buffer || {}},
                buffer.messages.map(function (message) {
                    return React.DOM.li({className: "list-group-item row" + (message.highlight === 1 ? " list-group-item-info" : ""),
                                         key: message.pointers.join(" ")}, [
-                       React.DOM.div({className: "col-sm-1 text-muted", key: "date"},
+                       React.DOM.div({className: "col-xs-6 col-sd-1 message-date text-muted", key: "date"},
                                      moment.unix(message.date).format('hh:mm:ss')),
-                       React.DOM.div({className: "col-sm-1 " + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : "text-primary"),
+                       React.DOM.div({className: "col-xs-6 col-sd-1 message-prefix " + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : "text-primary"),
                                       key: "prefix",
                                       dangerouslySetInnerHTML: {__html: Color.format(message.prefix)}}),
-                       React.DOM.div({className: "col-sm-10 " + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : ""),
+                       React.DOM.div({className: "col-xs-12 col-sd-10 message-text" + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : ""),
                                       key: "message",
                                       dangerouslySetInnerHTML: {__html: Color.format(message.message)}}
                        )
@@ -62,9 +58,13 @@ define([
                })
             ),
             InputBox({nicklist: this.props.buffer.nicklist,
+                      layout: this.props.layout,
                       handleSubmit: this.props.sendInputConstructor(this.props.buffer.info.pointers[0])})
           ]),
-          NicknameList({nicklist: this.props.buffer.nicklist})
+          NicknameList({
+            nicklist: this.props.buffer.nicklist,
+            layout: this.props.layout
+          })
         ]);
     }
 

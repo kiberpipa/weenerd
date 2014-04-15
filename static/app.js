@@ -70,7 +70,7 @@ define([
           self.setState({ buffers: buffers });
 
         } else {
-          console.log('EVENT MISSES:');
+          console.log('EVENT MISSED:');
           console.log(event);
         }
       });
@@ -82,7 +82,7 @@ define([
       }, function(buffers) {
         var buffersState = {};
         buffers.forEach(function(buffer) {
-          if (['channel', 'private'].indexOf(buffer.local_variables.type) !== -1) {
+          if (['relay'].indexOf(buffer.local_variables.type) === -1) {
             buffersState[buffer.pointers[0]] = { info: buffer, messages: [], nicklist: [] };
           }
         });
@@ -106,16 +106,17 @@ define([
               buffers = self.state.buffers;
               buffers[uid].messages = messages.reverse();
               self.setState({ buffers: buffers });
-            });
-            
-            self.socket.emit("nicklist", {buffer: uid}, function (nicks) {
-              buffers = self.state.buffers;
-             buffers[uid].nicklist = nicks.filter(function (nick) {
-                return (nick.group === 0 && nick.level === 0);
-              }).map(function (nick) {
-                  return nick.name;
-            });
-              self.setState({ buffers: buffers });
+
+              self.socket.emit("nicklist", {buffer: uid}, function (nicks) {
+                buffers = self.state.buffers;
+                buffers[uid].nicklist = nicks.filter(function (nick) {
+                  return (nick.group === 0 && nick.level === 0);
+                }).map(function (nick) {
+                    return nick.name;
+                });
+                self.setState({ buffers: buffers });
+              });
+
             });
           }
         });
@@ -155,19 +156,21 @@ define([
     render: function() {
       var self = this;
       return (
-        React.DOM.div({className: "row", style: {height: "100%"}}, [
+        React.DOM.div({}, [
           Dashboard({
             key: 'dashboard',
             buffers: self.state.buffers,
             openBuffer: self.openBuffer,
             closeBuffer: self.closeBuffer,
+            layout: this.props.layout || {}
           }),
-          React.DOM.div({ key: 'buffers', className: "col-lg-10"},
+          React.DOM.div({ key: 'buffers', className: 'buffers' },
             self.state.opened.map(function(uid) {
               return Buffer({
                 isActive: self.state.active === uid,
                 buffer: self.state.buffers[uid],
-                sendInputConstructor: self.sendInputConstructor
+                sendInputConstructor: self.sendInputConstructor,
+                layout: self.props.layout || {}
               });
             })
           )

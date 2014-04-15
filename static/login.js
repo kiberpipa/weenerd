@@ -10,6 +10,7 @@ define([
 
     render: function() {
       return React.DOM.form({
+        style: this.props.layout.login || {},
         action: '/login',
         method: 'post',
         role: 'form'

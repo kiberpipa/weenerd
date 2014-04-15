@@ -53,8 +53,10 @@ define([
                      autocompleteNick: ""});
     },
     render: function() {
-      return (React.DOM.div({className: "input-group"}, [
+      var layout = this.props.layout.bufferInput || {};
+      return (React.DOM.div({className: "input-group", style: layout.wrapper || {}}, [
         React.DOM.input({key: "input",
+                         style: layout.input || {},
                          className: "form-control",
                          type: "text",
                          value: this.state.value,
@@ -64,6 +66,7 @@ define([
                         className: "input-group-btn"},
           React.DOM.button({className: "btn btn-default",
                             type: "button",
+                            style: layout.button || {},
                             onClick: this.handleEnter}, "Send"))
       ]))
     }

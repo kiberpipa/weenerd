@@ -11,7 +11,7 @@ define([
     render: function() {
       var self = this;
 
-      return React.DOM.div({ key: 'buffers', className: "col-lg-2",style: {height: "100vh", "overflow-y": "auto"}},
+      return React.DOM.div({key: 'buffers', className: 'dashboard', style: this.props.layout.dashboard || {}},
                React.DOM.table({className: "table"}, React.DOM.tbody({},
                  Object.keys(self.props.buffers).map(function(uid) {
                    var buffer = self.props.buffers[uid];

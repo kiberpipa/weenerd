@@ -1,3 +1,63 @@
-html, body {
-    height: 100%;
+
+.wrapper {
+}
+
+.dashboard {
+  padding: 15px;
+  font-size: 1.2em;
+}
+
+.dashboard .table>thead>tr>th,
+.dashboard .table>tbody>tr>th,
+.dashboard .table>tfoot>tr>th,
+.dashboard .table>thead>tr>td,
+.dashboard .table>tbody>tr>td,
+.dashboard .table>tfoot>tr>td {
+  padding: 0;
+}
+.dashboard td a {
+  padding: 8px;
+  display: inline-block;
+}
+
+.dashboard .table>thead>tr:first-child>th,
+.dashboard .table>tbody>tr:first-child>th,
+.dashboard .table>tfoot>tr:first-child>th,
+.dashboard .table>thead>tr:first-child>td,
+.dashboard .table>tbody>tr:first-child>td,
+.dashboard .table>tfoot>tr:first-child>td {
+  border: 0;
+}
+
+.message-date {
+  font-size: 0.8em;
+}
+.message-prefix {
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.buffer-title {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #DDD; 
+  border-top: 0;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+@media (min-width: 768px) {
+
+  .buffer-unactive {
+    display: none;
+  }
+
+  .buffers ul li,
+  .buffers ul li:first-child,
+  .buffers ul li:last-child {
+    margin: 0;
+    border-radius: 0;
+  }
+
 }

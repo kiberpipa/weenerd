@@ -13,12 +13,20 @@ require([
   'domready',
   'react',
   './router'
-], function(domready, React, Router, undefined) {
+], function(domready, React, AppRouter, undefined) {
 
   domready(function() {
-    React.renderComponent(Router({
+
+
+    var router = AppRouter({
       path: window.location.pathname
-    }), document.body);
+    });
+
+    // TODO:
+    //window.addEventListener('resize', function(e) {
+    //  router.setState({ layout: calculate(window.innerWidth, window.innerHeight) });
+    //});
+    React.renderComponent(router, document.body);
   });
 
 });

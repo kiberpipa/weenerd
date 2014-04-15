@@ -291,7 +291,12 @@ io.sockets.on('connection', function(socket) {
     var id = args.id ? args.id + ' ' : '',
         buffer = ' ' + args.buffer || '';
 
-    send(id + 'nicklist' + buffer, cb);
+    relay.send(id + 'nicklist' + buffer, function() {
+      if (!Array.isArray(arguments[0])) {
+        arguments[0] = [arguments[0]];
+      }
+      cb.apply(this, arguments);
+    });
   });
 
   socket.on('input', function(args, cb) {
