@@ -7,6 +7,18 @@ define([
   './buffer'
 ], function(React, SocketIO, Dashboard, Buffer, undefined) {
 
+  function setdefaults(object, defaults) {
+    if (object === undefined) {
+      object = {};
+    }
+    Object.keys(defaults).forEach(function(key) {
+      if (object[key] === undefined) {
+        object[key] = defaults[key];
+      }
+    });
+    return object;
+  }
+
   var App = React.createClass({
 
     displayName: 'App',
@@ -17,6 +29,95 @@ define([
         opened: [],
         active: undefined
       };
+    },
+
+    fetchBuffers: function(uid, cb) {
+      var self = this;
+
+      uid = uid || 'gui_buffers(*)' 
+
+      self.socket.emit('hdata', {
+        path: 'buffer:' + uid,
+        keys: ['number', 'short_name', 'title', 'local_variables']
+      }, function(buffersInfo) {
+        var buffers = {};
+
+        if (!Array.isArray(buffersInfo)) {
+          buffersInfo = [ buffersInfo ];
+        }
+
+        buffersInfo = buffersInfo.filter(function(bufferInfo) {
+          return bufferInfo.local_variables.type !== 'relay';
+        });
+
+        buffersInfo.forEach(function(bufferInfo) {
+          buffers[bufferInfo.pointers[0]] = setdefaults(
+            buffers[bufferInfo.pointers[0]],
+            { info: {}, messages: [], nicklist: [] }
+          );
+          buffers[bufferInfo.pointers[0]].info = bufferInfo;
+        });
+
+
+        buffers = setdefaults(buffers, self.state.buffers)
+        self.setState({ buffers: buffers });
+
+        if (cb) {
+          buffersInfo.forEach(function(bufferInfo) {
+            cb(bufferInfo.pointers[0]);
+          });
+        }
+      });
+    },
+
+    fetchBufferMessages: function(uid, cb) {
+      var self = this;
+
+      self.socket.emit('hdata', {
+        path: 'buffer:' + uid + '/own_lines/last_line(-100)/data'
+      }, function(messages) {
+        var buffers = self.state.buffers;
+
+        if (!buffers[uid]) {
+          buffers[uid] = {};
+        }
+        buffers[uid] = setdefaults(buffers[uid], { info: {}, messages: [], nicklist: [] });
+        buffers[uid].messages = messages.reverse();
+
+        self.setState({ buffers: buffers });
+
+        if (cb) {
+          cb(uid);
+        }
+      });
+    },
+
+    fetchBufferNicklist: function(uid, cb) {
+      var self = this;
+
+      self.socket.emit("nicklist", {
+        buffer: uid
+      }, function (nicks) {
+        var buffers = self.state.buffers;
+
+        if (!buffers[uid]) {
+          buffers[uid] = {};
+        }
+        buffers[uid] = setdefaults(buffers[uid], { info: {}, messages: [], nicklist: [] });
+        buffers[uid].nicklist = nicks
+          .filter(function (nick) {
+            return (nick.group === 0 && nick.level === 0);
+          })
+          .map(function (nick) {
+            return nick.name;
+          });
+
+        self.setState({ buffers: buffers });
+
+        if (cb) {
+          cb(uid);
+        }
+      });
     },
 
     componentDidMount: function() {
@@ -42,6 +143,7 @@ define([
           if (Object.keys(self.state.buffers).indexOf(event[0].pointers[0]) === -1) {
             buffers[event[0].pointers[0]] = { info: event[0], messages: [], nicklist: [] };
             self.setState({ buffers: buffers });
+            self.fetchBuffers(event[0].pointers[0]);
           }
 
         } else if (event[1] === '_buffer_closing') {
@@ -76,18 +178,7 @@ define([
       });
 
       // get all buffers 
-      self.socket.emit('hdata', {
-        path: 'buffer:gui_buffers(*)',
-        keys: ['number', 'short_name', 'title', 'local_variables']
-      }, function(buffers) {
-        var buffersState = {};
-        buffers.forEach(function(buffer) {
-          if (['relay'].indexOf(buffer.local_variables.type) === -1) {
-            buffersState[buffer.pointers[0]] = { info: buffer, messages: [], nicklist: [] };
-          }
-        });
-        self.setState({ buffers: buffersState });
-      });
+      self.fetchBuffers();
     },
 
     componentDidUpdate: function(prevProps, prevState) {
@@ -97,28 +188,7 @@ define([
       // open buffers
       if (prevState.opened !== self.state.opened) {
         self.state.opened.forEach(function(uid) {
-
-          // get initial messages for buffer
-          if (prevState.opened.indexOf(uid) === -1) {
-            self.socket.emit('hdata', {
-              path: 'buffer:' + uid + '/own_lines/last_line(-100)/data'
-            }, function(messages) {
-              buffers = self.state.buffers;
-              buffers[uid].messages = messages.reverse();
-              self.setState({ buffers: buffers });
-
-              self.socket.emit("nicklist", {buffer: uid}, function (nicks) {
-                buffers = self.state.buffers;
-                buffers[uid].nicklist = nicks.filter(function (nick) {
-                  return (nick.group === 0 && nick.level === 0);
-                }).map(function (nick) {
-                    return nick.name;
-                });
-                self.setState({ buffers: buffers });
-              });
-
-            });
-          }
+          self.fetchBufferMessages(uid, self.fetchBufferNicklist);
         });
       }
     },

@@ -154,7 +154,16 @@ define([
     },
 
     componentDidMount: function() {
-      this.setState({layout: this.calculateLayout(window.innerWidth, window.innerHeight)})
+      var self = this;
+      self.setState({
+        layout: self.calculateLayout(window.innerWidth, window.innerHeight)
+      });
+      window.addEventListener('resize', function(e) {
+        self.setState({
+          layout: self.calculateLayout(window.innerWidth, window.innerHeight)
+        });
+      });
+
     },
 
     render: function() {

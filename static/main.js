@@ -16,17 +16,9 @@ require([
 ], function(domready, React, AppRouter, undefined) {
 
   domready(function() {
-
-
-    var router = AppRouter({
+    React.renderComponent(AppRouter({
       path: window.location.pathname
-    });
-
-    window.addEventListener('resize', function(e) {
-      router.setState({ layout: router.calculateLayout(window.innerWidth, window.innerHeight) });
-    });
-
-    React.renderComponent(router, document.body);
+    }), document.body);
   });
 
 });
