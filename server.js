@@ -302,7 +302,7 @@ io.sockets.on('connection', function(socket) {
     } else if (!args.data) {
       console.error('input command failed due to missing data argument.');
     } else {
-      send('input ' + buffer + ' ' + input, cb);
+      send('input ' + buffer + ' ' + args.data, cb);
     }
   });
 

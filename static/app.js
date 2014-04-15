@@ -18,9 +18,6 @@ define([
         active: undefined
       };
     },
-    
-   
-
 
     componentDidMount: function() {
       var self = this;
@@ -113,7 +110,7 @@ define([
             
             self.socket.emit("nicklist", {buffer: uid}, function (nicks) {
               buffers = self.state.buffers;
-              buffers[uid].nicklist = nicks.filter(function (nick) {
+             buffers[uid].nicklist = nicks.filter(function (nick) {
                 return (nick.group === 0 && nick.level === 0);
               }).map(function (nick) {
                   return nick.name;
@@ -123,6 +120,15 @@ define([
           }
         });
       }
+    },
+    
+    sendInputConstructor: function(buffer) {
+      var self = this;
+      return function (value) {
+        self.socket.emit('input', {
+            'buffer': buffer,
+            'data': value});  
+        }
     },
 
     openBuffer: function(uid) {
@@ -151,7 +157,8 @@ define([
             self.state.opened.map(function(uid) {
               return Buffer({
                 isActive: self.state.active === uid,
-                buffer: self.state.buffers[uid]
+                buffer: self.state.buffers[uid],
+                sendInputConstructor: self.sendInputConstructor
               });
             })
           )
