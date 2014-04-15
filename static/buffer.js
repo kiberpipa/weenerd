@@ -43,7 +43,9 @@ define([
             React.DOM.ul({className: "buffer-window",
                          key: "listgroup",
                          style: {"overflow-y": "auto",
-                                 "overflow-x": "hidden"}}, 
+                                 "overflow-x": "hidden",
+                                 height: "80vh"
+                         }}, 
                buffer.messages.map(function (message) {
                    return React.DOM.li({className: "list-group-item row" + (message.highlight === 1 ? " list-group-item-info" : ""),
                                         key: message.pointers.join(" ")}, [

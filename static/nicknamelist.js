@@ -12,7 +12,7 @@ define([
     },
     
     render: function() {
-        return React.DOM.div({className: "col-lg-2", style: {"overflow-y": "auto"}},
+        return React.DOM.div({className: "col-lg-2", style: {"overflow-y": "auto", height: "100vh"}},
                  React.DOM.table({className: "table"}, React.DOM.tbody({},
                     this.props.nicklist.map(function (nickname) {
                        return React.DOM.tr({}, React.DOM.td({}, nickname))
