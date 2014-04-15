@@ -31,8 +31,8 @@ var yargs = require('yargs')
   .demand(['username', 'password'])
   .describe('cookie-secret', 'Enabled signed cookie support.')
   .options('title', {
-    describe: 'Name of server instance.',
-    default: 'WeeCloud'
+    describe: 'Name of weenerd instance.',
+    default: 'weenerd - because fuck M0nd4y!'
   })
   .options('port', {
     describe: 'Port.',
