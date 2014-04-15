@@ -32,10 +32,12 @@ body {
 
 .message-date {
   font-size: 0.8em;
+  line-height: 1.9em;
 }
 .message-prefix {
   font-size: 0.8em;
   text-align: right;
+  line-height: 1.9em;
 }
 
 .buffer-title {
