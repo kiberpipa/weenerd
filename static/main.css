@@ -47,8 +47,13 @@ body {
 .dashboard td:hover .close-buffer {
   display: block;
 }
+
 .close-buffer {
   display: none;
+}
+
+.buffer-input {
+    background-color: #ddd;
 }
 
 .table {

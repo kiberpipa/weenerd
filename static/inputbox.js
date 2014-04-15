@@ -57,14 +57,15 @@ define([
       return (React.DOM.div({className: "input-group", style: layout.wrapper || {}}, [
         React.DOM.input({key: "input",
                          style: layout.input || {},
-                         className: "form-control",
+                         className: "form-control buffer-input",
+                         placeholder: "<type something here>",
                          type: "text",
                          value: this.state.value,
                          onChange: this.handleChange,
                          onKeyDown: this.handleInput}),
         React.DOM.span({key: "submit",
                         className: "input-group-btn"},
-          React.DOM.button({className: "btn btn-default",
+          React.DOM.button({className: "btn btn-primary",
                             type: "button",
                             style: layout.button || {},
                             onClick: this.handleEnter}, "Send"))
