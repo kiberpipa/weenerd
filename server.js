@@ -20,16 +20,6 @@ var yargs = require('yargs')
     describe: 'Options provides in JSON file.'
   })
   .config('c')
-  .options('username', {
-    describe: 'Username.',
-    alias: 'u'
-  })
-  .options('password', {
-    describe: 'Password.',
-    alias: 'p'
-  })
-  .demand(['username', 'password'])
-  .describe('cookie-secret', 'Enabled signed cookie support.')
   .options('title', {
     describe: 'Name of weenerd instance.',
     default: 'weenerd - because fuck M0nd4y!'
@@ -80,77 +70,20 @@ if (argv.verbose) {
 
 
 //
-// --- AUTHENTICATION (PASSPORT) ---
-//
-
-
-var passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy;
-
-passport.use(new LocalStrategy(function(username, password, done) {
-  if (argv.username === username && argv.password === password) {
-      console.log('Logged in.');
-      return done(null, username);
-  }
-  console.warn('Wrong attempt: ' + username + '/' + password);
-  return done(null, false, { message: 'Incorrect.' });
-}));
-
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function(user, done) {
-  done(null, user);
-});
-
-
-//
 // --- MIDDLEWARE (EXPRESS) ---
 //
 
 
 var express = require('express'),
-    bodyParser = require('body-parser'),
-    cookieParser = require('cookie-parser'),
-    session = require('express-session'),
-    flash = require('express-flash'),
-    app = express();
-
-app
-  .use('/bower_components', express.static(__dirname + '/bower_components'))
-  .use('/static', express.static(__dirname + '/static'))
-  .use(bodyParser())
-  .use(cookieParser(argv['cookie-secret']))
-  .use(session({
-    secret: Math.random().toString() + (new Date()).valueOf().toString(),
-    cookie: { maxAge: 60000 }
-  }))
-  .use(flash())
-  .use(passport.initialize())
-  .use(passport.session())
-  .use(function(req, res, next) {
-    app.locals.request = req;
-    app.locals.response = req;
-    next();
-  });
-
-app.locals.title = argv.title;
-
-
-//
-//  --- ROUTES ---
-//
-
-var React = require('react'),
+    React = require('react'),
     ReactRouter = require('react-router-component'),
     AppRouter = require('./static/router'),
     url = require('url'),
-    ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn,
-    ensureLoggedOut = require('connect-ensure-login').ensureLoggedOut;
+    app = express();
     
-
-var renderApp = function(req, res, next) {
+app
+  .use('/static', express.static(__dirname + '/static'))
+  .get('/', function(req, res, next) {
   try {
 
     var content = React.renderComponentToString(
@@ -163,35 +96,18 @@ var renderApp = function(req, res, next) {
       ' <head>' +
       '  <title>' + argv.title + '</title>' +
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />' +
-      '  <link type="text/css" rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">' +
+      '  <link type="text/css" rel="stylesheet" href="/static/lib/bootstrap/css/bootstrap.min.css">' +
       '  <link type="text/css" rel="stylesheet" href="/static/main.css">' +
       ' </head>' +
       ' <body>' + content +
-      '  <script data-main="/static/main.js" src="bower_components/requirejs/require.js"></script>' +
+      '  <script data-main="/static/main.js" src="/static/lib/require.js"></script>' +
       ' </body>' +
       '</html>')
 
   } catch(err) {
     return next(err)
   }
-};
-
-app.route('/login')
-  .get(ensureLoggedOut('/'), renderApp)
-  .post(ensureLoggedOut('/'), passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-  }));
-
-app.route('/logout')
-  .get(ensureLoggedIn('/'), function(req, res, next) {
-    req.logout();
-    res.redirect('/');
-  });
-
-app.route('/')
-  .get(ensureLoggedIn('/login'), renderApp)
+});
 
 
 

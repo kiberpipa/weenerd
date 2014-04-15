@@ -24,22 +24,16 @@
     "url": "git://github.com/garbas/weecloud-react.git"
   },
   "dependencies": {
+    "amdefine": "^0.1.0",
+    "domready": "~1.0.4",
     "express": "^4.0.0",
-    "passport": "^0.2.0",
-    "passport-local": "^1.0.0",
-    "yargs": "^1.2.1",
-    "express-flash": "0.0.2",
-    "cookie-parser": "^1.0.1",
-    "express-session": "^1.0.2",
-    "body-parser": "^1.0.1",
-    "connect-ensure-login": "^0.1.1",
-    "socket.io": "^0.9.16",
-    "envify": "^1.2.1",
-    "react": "^0.10.0",
     "moment": "^2.6.0",
+    "react": "^0.10.0",
     "react-async": "^0.9.1",
     "react-router-component": "^0.18.2",
-    "amdefine": "^0.1.0",
-    "weechat": "0.0.17"
+    "requirejs": "~2.1.11",
+    "socket.io": "^0.9.16",
+    "weechat": "0.0.17",
+    "yargs": "^1.2.1"
   }
 }

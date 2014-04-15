@@ -1,10 +1,10 @@
 requirejs.config({
   paths: {
-    'domready': '/bower_components/requirejs-domready/domReady',
-    'react' : '/bower_components/react/react-with-addons',
-    'react-async' : '/bower_components/react-async/react-async',
-    'moment' : '/bower_components/moment/moment',
-    'react-router-component' : '/bower_components/react-router-component/react-router-component',
+    'domready': '/static/lib/domready',
+    'react' : '/static/lib/react/react-with-addons',
+    'react-async' : '/static/lib/react/react-async',
+    'moment' : '/static/lib/moment',
+    'react-router-component' : '/static/lib/react/react-router-component',
     'socket.io' : '/socket.io/socket.io'
   }
 });
