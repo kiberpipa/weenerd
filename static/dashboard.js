@@ -18,14 +18,15 @@ define([
                    return React.DOM.tr({ key: uid },
                             React.DOM.td({},
                               React.DOM.a({href: "#",
+                                           className: 'dashboard-buffer',
                                            onClick: function(e) {
                                              self.props.openBuffer(uid);
                                              e.preventDefault();
                                            }}, [React.DOM.span({}, buffer.info.short_name),
                                                 React.DOM.a({onClick: function(e) {
                                                     self.props.closeBuffer(uid);
-                                                },
-                                                             className: "pull-right"},
+                                                }, href: '#',
+                                                             className: 'dashboard-buffer-close'},
                                                              React.DOM.span({ className: "glyphicon glyphicon-remove close-buffer"}))])
                             ));
                  })

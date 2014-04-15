@@ -16,9 +16,20 @@ body {
 .dashboard .table>tfoot>tr>td {
   padding: 0;
 }
-.dashboard td a {
+
+.dashboard-buffer {
   padding: 8px;
-  display: inline-block;
+  display: block;
+  float: left;
+  width: 162px;
+}
+
+.dashboard-buffer-close {
+  margin: 0.6em;
+  display: block;
+  float: right;
+  width: 17px;
+  text-decoration: none;
 }
 
 .dashboard .table>thead>tr:first-child>th,
@@ -55,7 +66,7 @@ body {
 }
 
 .buffer-input {
-    background-color: #ddd;
+    background-color: #EEE;
 }
 
 .table {
