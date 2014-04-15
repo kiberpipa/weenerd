@@ -18,18 +18,32 @@ body {
 }
 
 .dashboard-buffer {
-  padding: 8px;
+  padding: 4px 8px;
   display: block;
   float: left;
   width: 162px;
 }
 
 .dashboard-buffer-close {
-  margin: 0.6em;
+  margin: 0.8em;
   display: block;
   float: right;
-  width: 17px;
+  width: 12px;
+  font-size: 0.7em;
+}
+
+.dashboard-buffer-close:hover {
   text-decoration: none;
+}
+
+.table>thead>tr>th,
+.table>tbody>tr>th,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>tbody>tr>td,
+.table>tfoot>tr>td {
+  border-top: 0;
+  padding: 0.2em 0.5em;
 }
 
 .dashboard .table>thead>tr:first-child>th,
@@ -61,6 +75,11 @@ body {
   display: block;
 }
 
+.buffer-messages {
+  border-left: 1px solid #DDD;
+  border-right: 1px solid #DDD;
+}
+
 .close-buffer {
   display: none;
 }
@@ -74,6 +93,18 @@ body {
 }
 
 @media (min-width: 768px) {
+
+  .buffers ul li,
+  .buffers ul li:first-child,
+  .buffers ul li:last-child {
+    padding: 0.2em 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  .buffers ul li:last-child {
+    border-bottom: 1px solid #DDD;
+  }
 
   .buffer-unactive {
     display: none;

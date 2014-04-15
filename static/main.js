@@ -22,10 +22,10 @@ require([
       path: window.location.pathname
     });
 
-    // TODO:
-    //window.addEventListener('resize', function(e) {
-    //  router.setState({ layout: calculate(window.innerWidth, window.innerHeight) });
-    //});
+    window.addEventListener('resize', function(e) {
+      router.setState({ layout: router.calculateLayout(window.innerWidth, window.innerHeight) });
+    });
+
     React.renderComponent(router, document.body);
   });
 
