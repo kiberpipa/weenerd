@@ -159,9 +159,15 @@ define([], function(undefined) {
       return p;
     });
   }
+      
+  function escapeHTML (str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+  }
   
   function format(text) {
-    var parts = parse(text);
+    var parts = parse(escapeHTML(text));
     if (!parts) return '';
 
     return parts.map(function(part) {
