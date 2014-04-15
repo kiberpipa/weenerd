@@ -50,7 +50,7 @@ define([
                        React.DOM.div({className: "col-xs-6 col-sd-1 message-prefix " + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : "text-primary"),
                                       key: "prefix",
                                       dangerouslySetInnerHTML: {__html: Color.format(message.prefix)}}),
-                       React.DOM.div({className: "col-xs-12 col-sd-10 message-text" + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : ""),
+                       React.DOM.div({className: "col-xs-12 col-sd-10 message-text " + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : ""),
                                       key: "message",
                                       dangerouslySetInnerHTML: {__html: Color.format(message.message)}}
                        )

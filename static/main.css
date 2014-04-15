@@ -1,5 +1,6 @@
 
-.wrapper {
+body {
+    overflow: hidden;
 }
 
 .dashboard {
@@ -41,6 +42,13 @@
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid #DDD; 
   border-top: 0;
+}
+
+.dashboard td:hover .close-buffer {
+  display: block;
+}
+.close-buffer {
+  display: none;
 }
 
 .table {

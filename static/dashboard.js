@@ -26,7 +26,7 @@ define([
                                                     self.props.closeBuffer(uid);
                                                 },
                                                              className: "pull-right"},
-                                                             React.DOM.span({ className: "glyphicon glyphicon-remove"}))])
+                                                             React.DOM.span({ className: "glyphicon glyphicon-remove close-buffer"}))])
                             ));
                  })
                  )
