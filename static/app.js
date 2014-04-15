@@ -127,8 +127,9 @@ define([
       return function (value) {
         self.socket.emit('input', {
             'buffer': buffer,
-            'data': value});  
-        }
+            'data': value
+        });  
+      }
     },
 
     openBuffer: function(uid) {
@@ -143,6 +144,13 @@ define([
 
       this.setState(state);
     }, 
+    
+    closeBuffer: function(uid) {
+      this.socket.emit('input', {
+          'buffer': uid,
+          'data': "/close"
+      });  
+    },
 
     render: function() {
       var self = this;
@@ -151,7 +159,8 @@ define([
           Dashboard({
             key: 'dashboard',
             buffers: self.state.buffers,
-            openBuffer: self.openBuffer
+            openBuffer: self.openBuffer,
+            closeBuffer: self.closeBuffer,
           }),
           React.DOM.div({ key: 'buffers', className: "col-lg-10"},
             self.state.opened.map(function(uid) {

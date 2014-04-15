@@ -295,7 +295,7 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('input', function(args, cb) {
-    var buffer = args.buffer + ' ' || '';
+    var buffer = args.buffer || '', cmd;
 
     if (!args.buffer) {
       console.error('input command failed due to missing buffer argument.');

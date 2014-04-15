@@ -21,7 +21,12 @@ define([
                                            onClick: function(e) {
                                              self.props.openBuffer(uid);
                                              e.preventDefault();
-                                           }}, buffer.info.short_name)
+                                           }}, [React.DOM.span({}, buffer.info.short_name),
+                                                React.DOM.a({onClick: function(e) {
+                                                    self.props.closeBuffer(uid);
+                                                },
+                                                             className: "pull-right"},
+                                                             React.DOM.span({ className: "glyphicon glyphicon-remove"}))])
                             ));
                  })
                  )
