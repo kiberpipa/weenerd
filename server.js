@@ -3,7 +3,7 @@
 //
 
 var ensureArray = function (maybeArray) {
-  if (!Array.isArray(maybeArray)) {
+  if (Array.isArray(maybeArray) !== true) {
     return [maybeArray];
   }  else {
     return maybeArray;
@@ -292,8 +292,9 @@ io.sockets.on('connection', function(socket) {
     var id = args.id ? args.id + ' ' : '',
         buffer = ' ' + args.buffer || '';
 
-    relay.send(id + 'nicklist' + buffer, function() {
-      cb.apply(this, ensureArray(arguments));
+    relay.send(id + 'nicklist' + buffer, function(nicklist) {
+      nicklist = ensureArray(nicklist);
+      cb.apply(this, nicklist);
     });
   });
 

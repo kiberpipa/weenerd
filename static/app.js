@@ -98,7 +98,8 @@ define([
 
       self.socket.emit("relay:nicklist", {
         buffer: uid
-      }, function (nicks) {
+      }, function () {
+        var nicks = Array.prototype.slice.call(arguments);
         var buffers = self.state.buffers;
 
         if (!buffers[uid]) {
@@ -349,7 +350,7 @@ define([
     },
     
     closeBuffer: function(uid) {
-      self.socket.emit('relay:input', {
+      this.socket.emit('relay:input', {
           'buffer': uid,
           'data': "/close"
       });
