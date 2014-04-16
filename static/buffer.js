@@ -39,9 +39,13 @@ define([
       // TODO: when updating topic, short_name has a funny name 
       return React.DOM.div({ className: this.props.isActive ? " buffer-active" : "buffer-unactive" }, [
           React.DOM.div({className: "list-group col-lg-10"}, [
-            React.DOM.h3({ key: 'title', className: 'buffer-title', style: this.props.layout.bufferTitle || {} }, name + ": " + buffer.info.title),
-            React.DOM.ul({ key: "listgroup", className: 'buffer-messages',
-                           style: this.props.layout.buffer || {}},
+            React.DOM.h3({key: 'title',
+                          className: 'buffer-title',
+                          style: this.props.layout.bufferTitle || {},
+                          dangerouslySetInnerHTML: {__html: Color.format(name + ": " + buffer.info.title)}}),
+            React.DOM.ul({key: "listgroup",
+                          className: 'buffer-messages',
+                          style: this.props.layout.buffer || {}},
                buffer.messages.map(function (message) {
                    return React.DOM.li({className: "list-group-item row" + (message.highlight === 1 ? " list-group-item-info" : ""),
                                         key: message.pointers.join(" ")}, [
