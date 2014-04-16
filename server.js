@@ -129,36 +129,69 @@ server
 //
 
 var weechat = require('weechat'),
-    relay = weechat.connect(
-      argv['relay-host'],
-      argv['relay-port'],
-      argv['relay-password'],
-      argv['relay-ssl'],
-      function() {
-        console.log('Connected to ' +
-                    argv['relay-host'] + ':' +
-                    argv['relay-port'] + '!');
-      }
-    );
+    relay;
 
+
+process.on('uncaughtException', function(error) {
+  relay = undefined;
+  console.dir(error);
+});
+
+io.set('log level', 1);
 io.sockets.on('connection', function(socket) {
 
   var send = function(command, cb) {
     console.log('RELAY: ' + command);
-    relay.send(command, function() { cb.apply(this, arguments); });
+    relay.send(command, function() {
+      if (cb) {
+        cb.apply(this, arguments);
+      }
+    });
   };
 
-  relay.on(function() {
-    socket.emit('events', arguments); 
-  });
+  setInterval(function() {
 
-  relay.on('error', function(error) {
-    console.log('RELAY: ' + error.code + ' - ' + error.message);
-  });
+    // is relay still connected?
+    if (relay) {
+      send('ping ' + (new Date()).toString());
+    
+    // in case is not connected we try to connect to relay
+    } else {
+      console.log('Trying to connect to relay...');
+      relay = weechat.connect(
+        argv['relay-host'],
+        argv['relay-port'],
+        argv['relay-password'],
+        argv['relay-ssl'],
+        function() {
+
+          console.log('Connected to ' +
+                      argv['relay-host'] + ':' +
+                      argv['relay-port'] + '!');
+
+          relay.on(function() {
+            socket.emit('relay:events', arguments); 
+          });
+
+          relay.on('error', function(error) {
+            console.log('RELAY: ' + error.code + ' - ' + error.message);
+            if (error.code === 'EPIPE') {
+              relay = undefined;
+              socket.emit('relay:disconnected');
+            }
+            socket.emit('relay:error', { code: error.code, message: error.message });
+          });
+
+          socket.emit('relay:connected');
+        }
+      );
+    }
+
+  }, 5000);
 
   // http://www.weechat.org/files/doc/devel/weechat_relay_protocol.en.html#commands
 
-  socket.on('init', function(args, cb) {
+  socket.on('relay:init', function(args, cb) {
     var password = args.password ? ' password=' + args.password : '',
         compression = args.compression ? ' compression=' + args.compression: '';
 
@@ -170,7 +203,7 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('hdata', function(args, cb) {
+  socket.on('relay:hdata', function(args, cb) {
     var id = args.id ? args.id + ' ' : '',
         keys = args.keys ? ' ' + (args.keys || []).join(',') : '';
 
@@ -181,7 +214,7 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('info', function(args, cb) {
+  socket.on('relay:info', function(args, cb) {
     var id = args.id + ' ' || '';
 
     if (!args.name) {
@@ -191,7 +224,7 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('infolist', function(args, cb) {
+  socket.on('relay:infolist', function(args, cb) {
     var id = args.id + ' ' || '',
         pointer = args.pointer + ' ' || '',
         arguments = args.arguments + ' ' || '';
@@ -203,7 +236,7 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('nicklist', function(args, cb) {
+  socket.on('relay:nicklist', function(args, cb) {
     var id = args.id ? args.id + ' ' : '',
         buffer = ' ' + args.buffer || '';
 
@@ -215,7 +248,7 @@ io.sockets.on('connection', function(socket) {
     });
   });
 
-  socket.on('input', function(args, cb) {
+  socket.on('relay:input', function(args, cb) {
     var buffer = args.buffer || '', cmd;
 
     if (!args.buffer) {
@@ -228,7 +261,7 @@ io.sockets.on('connection', function(socket) {
   });
 
   ['sync', 'desync'].forEach(function(command) {
-    socket.on(command, function(args, cb) {
+    socket.on('relay:' + command, function(args, cb) {
       var buffers = '', options = '';
 
       if (args.buffers) {
@@ -257,18 +290,18 @@ io.sockets.on('connection', function(socket) {
     });
   });
 
-  socket.on('test', function(args, cb) {
+  socket.on('relay:test', function(args, cb) {
     send('test', cb);
   });
 
-  socket.on('ping', function(args, cb) {
+  socket.on('relay:ping', function(args, cb) {
     if (args) {
       args = ' ' + args;
     }
-    send('test' + args, cb);
+    send('ping' + args, cb);
   });
 
-  socket.on('quit', function(args, cb) {
+  socket.on('relay:quit', function(args, cb) {
     send('quit', cb);
   });
 

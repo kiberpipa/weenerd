@@ -26,6 +26,7 @@ define([
 
     getInitialState: function() {
       return {
+        connected: false,
         buffers: {},
         opened: [],
         active: undefined
@@ -37,7 +38,7 @@ define([
 
       uid = uid || 'gui_buffers(*)' 
 
-      self.socket.emit('hdata', {
+      self.socket.emit('relay:hdata', {
         path: 'buffer:' + uid,
         keys: ['number', 'full_name', 'short_name', 'title', 'local_variables']
       }, function(buffersInfo) {
@@ -72,7 +73,7 @@ define([
     fetchBufferMessages: function(uid, cb) {
       var self = this;
 
-      self.socket.emit('hdata', {
+      self.socket.emit('relay:hdata', {
         path: 'buffer:' + uid + '/own_lines/last_line(-100)/data'
       }, function(messages) {
         var buffers = self.state.buffers;
@@ -94,7 +95,7 @@ define([
     fetchBufferNicklist: function(uid, cb) {
       var self = this;
 
-      self.socket.emit("nicklist", {
+      self.socket.emit("relay:nicklist", {
         buffer: uid
       }, function (nicks) {
         var buffers = self.state.buffers;
@@ -124,8 +125,12 @@ define([
 
       self.socket = SocketIO.connect();
 
-      // listen to all events from relay
-      self.socket.on('events', function(event) {
+      self.socket.on('relay:error', function (error) {
+        console.log('ERROR: ' + error.code + ' - ' + error.message);
+      });
+
+      // listen to all (non error) events from relay
+      self.socket.on('relay:events', function(event) {
         var buffers = self.state.buffers,
             opened = self.state.opened,
             active = self.state.active;
@@ -176,28 +181,51 @@ define([
         }
       });
 
-      // get all buffers 
-      self.fetchBuffers(undefined, function() {
+      self.socket.on('relay:connected', function () {
 
-        // open buffers from cookie
         var opened = Cookie.getItem('opened'),
             active = Cookie.getItem('active'),
             state = {};
 
+        // on every socket connect set to initial state
+        state = self.getInitialState();
         if (opened) {
           state.opened = opened.split(',').filter(function(buffer) {
             return Object.keys(self.state.buffers).indexOf(buffer) !== -1;
           });
         }
-
         if (active && Object.keys(self.state.buffers).indexOf(active) !== -1) {
           state.active = active;
         }
+        self.setState(state);
 
-        if (Object.keys(state).length !== 0) {
-          self.setState(state);
-        }
+        // get all buffers 
+        self.fetchBuffers(undefined, function() {
 
+          // open buffers from cookie
+          state = {};
+
+          if (opened) {
+            state.opened = opened.split(',').filter(function(buffer) {
+              return Object.keys(self.state.buffers).indexOf(buffer) !== -1;
+            });
+          }
+
+          if (active && Object.keys(self.state.buffers).indexOf(active) !== -1) {
+            state.active = active;
+          }
+
+          if (Object.keys(state).length !== 0) {
+            self.setState(state);
+          }
+
+        });
+
+      });
+
+      // we gracefully handle disconnect
+      self.socket.on('disconnect', function () {
+        console.log('Socket is disconnected.');
       });
 
     },
@@ -224,7 +252,7 @@ define([
     sendInputConstructor: function(buffer) {
       var self = this;
       return function (value) {
-        self.socket.emit('input', {
+        self.socket.emit('relay:input', {
             'buffer': buffer,
             'data': value
         });  
@@ -245,7 +273,7 @@ define([
     }, 
     
     closeBuffer: function(uid) {
-      self.socket.emit('input', {
+      self.socket.emit('relay:input', {
           'buffer': uid,
           'data': "/close"
       });
