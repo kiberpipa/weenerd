@@ -13,13 +13,15 @@ define([
 
     getDefaultProps: function() {
       return {
-        layout: {} 
+        layout: {},
+        documentTitle: ""
       };
     },
 
     getInitialState: function() {
       return {
-        layout: {}
+        layout: {},
+        documentTitle: this.props.documentTitle
       }
     },
 
@@ -182,7 +184,8 @@ define([
     componentDidMount: function() {
       var self = this;
       self.setState({
-        layout: self.calculateLayout(window.innerWidth, window.innerHeight)
+        layout: self.calculateLayout(window.innerWidth, window.innerHeight),
+        documentTitle: document.title
       });
       window.addEventListener('resize', function(e) {
         self.setState({
@@ -197,7 +200,7 @@ define([
       return (
         React.DOM.div({ style: hidden },
           Router.Locations({ path: this.props.path }, [
-            Router.Location({ layout: this.state.layout, path: '/', handler: App }),
+            Router.Location({ layout: this.state.layout, path: '/', documentTitle: this.state.documentTitle, handler: App }),
             Router.Location({ layout: this.state.layout, path: '/login', handler: Login })
           ])
         )

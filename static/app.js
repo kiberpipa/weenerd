@@ -5,8 +5,9 @@ define([
   'socket.io',
   './cookie',
   './dashboard',
+  './color',
   './buffer'
-], function(React, SocketIO, Cookie, Dashboard, Buffer, undefined) {
+], function(React, SocketIO, Cookie, Dashboard, Color, Buffer, undefined) {
 
   function setdefaults(object, defaults) {
     if (object === undefined) {
@@ -29,6 +30,7 @@ define([
         connected: false,
         buffers: {},
         opened: [],
+        notifications: [],
         active: undefined
       };
     },
@@ -60,8 +62,7 @@ define([
           buffers[bufferInfo.pointers[0]].info = bufferInfo;
         });
 
-
-        buffers = setdefaults(buffers, self.state.buffers)
+        buffers = setdefaults(buffers, self.state.buffers);
         self.setState({ buffers: buffers });
 
         if (cb) {
@@ -119,6 +120,11 @@ define([
         }
       });
     },
+    
+    markNotificationsAsRead: function(notifications) {
+       this.socket.emit('notification:markread', {notifications: notifications}); 
+       this.setState({notifications: []});
+    },
 
     handleOnConnect: function() {
       var self = this,
@@ -143,6 +149,8 @@ define([
 
         // open buffers from cookie
         state = { connected: true };
+        
+        
 
         if (opened) {
           state.opened = opened.split(',').filter(function(buffer) {
@@ -163,8 +171,44 @@ define([
 
     componentDidMount: function() {
       var self = this;
-
+      
+      // request for notification permissions
+      window.Notification.requestPermission(function(permission) {
+        window.Notification.permission = permission;
+      });
+      
       self.socket = SocketIO.connect();
+      
+      self.socket.on('notifications', function(notifications) {
+          // ignore notifications for active buffer
+          // TODO: we shouldn't ignore if tab is not focused
+          notifications = notifications.filter(function (n) { 
+              return n.event.buffer != self.state.active;
+          });
+          
+          self.setState({notifications: self.state.notifications.concat(notifications)});
+          
+          // notify 
+          if (window.Notification.permission === "granted") {
+              notifications.forEach(function (notification) {
+                var n = new window.Notification(Color.format(self.state.buffers[notification.event.buffer].info.short_name), {
+                    body: Color.format(notification.event.prefix + " " + notification.event.message),
+                    icon: "http://www.favicon.cc/logo3d/449619.png"
+                });
+                
+                n.onclick = function(x) { 
+                    window.focus();
+                    self.openBuffer(notification.event.buffer);
+                    // TODO: scroll to the right position in bufferS1
+                };
+                
+                // autoclose after 5sec
+                setTimeout(function() {n.close()}, 5000); 
+              });
+              
+          }
+          
+      });
 
       self.socket.on('relay:error', function (error) {
         console.log('ERROR: ' + error.code + ' - ' + error.message);
@@ -235,14 +279,28 @@ define([
         console.log('Socket is disconnected.');
       });
 
-
+      // TODO: on reconnect we should probably remove current notifications
+      // since they will be re-fetched
+      //self.setState({notifications: []});
       self.socket.emit('client:initialized');
 
     },
 
     componentDidUpdate: function(prevProps, prevState) {
       var self = this,
-          buffers;
+          title_prefix,
+          num_notifications = self.state.notifications.length;
+          
+      if (num_notifications > 0) {
+          title_prefix = '(' + num_notifications+ ')'
+      } else {
+          title_prefix = '';
+      }
+      
+      if (this.activeBuffer()) {
+          title_prefix = title_prefix + ' ' + this.activeBuffer().info.short_name;
+      }
+      document.title = title_prefix + ' | ' + self.props.documentTitle;
 
 
       // open buffers
@@ -278,9 +336,17 @@ define([
       if (state.opened.indexOf(uid) === -1) {
         state.opened = state.opened.concat([ uid ]);
       }
+      
+      this.markNotificationsAsRead(this.state.notifications.filter(function (n) {
+          return n.event.buffer == uid;
+      }));
 
       this.setState(state);
     }, 
+    
+    activeBuffer: function() {
+      return this.state.buffers[this.state.active]
+    },
     
     closeBuffer: function(uid) {
       self.socket.emit('relay:input', {
@@ -317,6 +383,8 @@ define([
             buffers: self.state.buffers,
             openBuffer: self.openBuffer,
             closeBuffer: self.closeBuffer,
+            notifications: self.state.notifications,
+            markNotificationsAsRead: self.markNotificationsAsRead,
             layout: this.props.layout || {}
           }),
           React.DOM.div({ key: 'buffers', className: 'buffers' },

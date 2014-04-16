@@ -1,4 +1,19 @@
 //
+// --- UTILS --->
+//
+
+var ensureArray = function (maybeArray) {
+  if (!Array.isArray(maybeArray)) {
+    return [maybeArray];
+  }  else {
+    return maybeArray;
+  }
+};
+
+// array of notifications that are unread
+var unreadNotifications = [];
+
+//
 // --- CLI ---
 //
 
@@ -87,7 +102,7 @@ app
   try {
 
     var content = React.renderComponentToString(
-      AppRouter({ path: url.parse(req.url).pathname })
+      AppRouter({ path: url.parse(req.url).pathname, documentTitle: argv.title })
     );
 
     res.send(
@@ -130,6 +145,7 @@ server
 //
 
 var weechat = require('weechat'),
+    crypto = require('crypto'),
     relay;
 
 
@@ -171,6 +187,22 @@ io.sockets.on('connection', function(socket) {
                       argv['relay-port'] + '!');
 
           relay.on(function() {
+            // emit notifications for private chat and nick highlight
+            // handle server-side state what notifications are pending
+            ensureArray(arguments[0]).forEach(function(event) {
+                if (event.highlight === 1 || (event.tags_array && event.tags_array.indexOf("notify_private") > -1)) {
+                    var shasum = crypto.createHash('sha1');
+                    shasum.update(JSON.stringify(event));
+                    var hash = shasum.digest('hex'),
+                        notification = {
+                            hash: hash,
+                            event: event
+                        };
+                    unreadNotifications.push(notification);
+                    socket.emit('notifications', [notification]);
+                }
+            });
+            
             socket.emit('relay:events', arguments); 
           });
 
@@ -193,7 +225,16 @@ io.sockets.on('connection', function(socket) {
   socket.on('client:initialized', function() {
     if (relay) {
       socket.emit('relay:connected');
+      if (unreadNotifications.length > 0) {
+         socket.emit('notifications', unreadNotifications);
+      }
     }
+  });
+  
+  socket.on('notification:markread', function(args, cb) {
+      unreadNotifications = unreadNotifications.filter(function (notification) {
+          return args.notifications.indexOf(notification.hash) === -1;
+      });
   });
 
   //
@@ -252,10 +293,7 @@ io.sockets.on('connection', function(socket) {
         buffer = ' ' + args.buffer || '';
 
     relay.send(id + 'nicklist' + buffer, function() {
-      if (!Array.isArray(arguments[0])) {
-        arguments[0] = [arguments[0]];
-      }
-      cb.apply(this, arguments);
+      cb.apply(this, ensureArray(arguments));
     });
   });
 
@@ -288,7 +326,7 @@ io.sockets.on('connection', function(socket) {
 
       if (args.options) {
         if (!Array.isArray(args.options)) {
-          optins = args.options;
+          options = args.options;
         } else {
           options = args.options.join(',');
         }
