@@ -3,9 +3,10 @@ if (typeof define !== 'function') { var define = require('amdefine')(module) }
 define([
   'react',
   'socket.io',
+  './cookie',
   './dashboard',
   './buffer'
-], function(React, SocketIO, Dashboard, Buffer, undefined) {
+], function(React, SocketIO, Cookie, Dashboard, Buffer, undefined) {
 
   function setdefaults(object, defaults) {
     if (object === undefined) {
@@ -38,7 +39,7 @@ define([
 
       self.socket.emit('hdata', {
         path: 'buffer:' + uid,
-        keys: ['number', 'short_name', 'title', 'local_variables']
+        keys: ['number', 'full_name', 'short_name', 'title', 'local_variables']
       }, function(buffersInfo) {
         var buffers = {};
 
@@ -63,9 +64,7 @@ define([
         self.setState({ buffers: buffers });
 
         if (cb) {
-          buffersInfo.forEach(function(bufferInfo) {
-            cb(bufferInfo.pointers[0]);
-          });
+          cb(buffersInfo);
         }
       });
     },
@@ -178,15 +177,44 @@ define([
       });
 
       // get all buffers 
-      self.fetchBuffers();
+      self.fetchBuffers(undefined, function() {
+
+        // open buffers from cookie
+        var opened = Cookie.getItem('opened'),
+            active = Cookie.getItem('active'),
+            state = {};
+
+        if (opened) {
+          state.opened = opened.split(',').filter(function(buffer) {
+            return Object.keys(self.state.buffers).indexOf(buffer) !== -1;
+          });
+        }
+
+        if (active && Object.keys(self.state.buffers).indexOf(active) !== -1) {
+          state.active = active;
+        }
+
+        if (Object.keys(state).length !== 0) {
+          self.setState(state);
+        }
+
+      });
+
     },
 
     componentDidUpdate: function(prevProps, prevState) {
       var self = this,
           buffers;
 
+
       // open buffers
       if (prevState.opened !== self.state.opened) {
+
+        // write buffers to cookie
+        Cookie.setItem('opened', self.state.opened.join(','));
+        Cookie.setItem('active', self.state.active);
+
+        // fetch messages for each open relay
         self.state.opened.forEach(function(uid) {
           self.fetchBufferMessages(uid, self.fetchBufferNicklist);
         });
@@ -217,10 +245,10 @@ define([
     }, 
     
     closeBuffer: function(uid) {
-      this.socket.emit('input', {
+      self.socket.emit('input', {
           'buffer': uid,
           'data': "/close"
-      });  
+      });
     },
 
     render: function() {
