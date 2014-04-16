@@ -189,7 +189,17 @@ io.sockets.on('connection', function(socket) {
 
   }, 5000);
 
+  socket.on('client:initialized', function() {
+    if (relay) {
+      socket.emit('relay:connected');
+    }
+  });
+
+  //
+  // forwarding all weechat relat commands from client to relay
+  //
   // http://www.weechat.org/files/doc/devel/weechat_relay_protocol.en.html#commands
+  //
 
   socket.on('relay:init', function(args, cb) {
     var password = args.password ? ' password=' + args.password : '',

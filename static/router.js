@@ -26,6 +26,21 @@ define([
     calculateLayout: function(width, height) {
       if (width < 768) { // mobile
         return {
+          connecting: {
+            outer: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: width,
+              height: height
+            },
+            inner: {
+              position: 'relative',
+              top: (height / 2) - 50,
+              left: 0.2 * width,
+              width: 0.6 * width
+            }
+          },
           login: { 
             position: 'absolute',
             top: ((height - 200) / 2) - 30,
@@ -85,6 +100,17 @@ define([
         };
       } else { // desktop
         return {
+          connecting: {
+            outer: {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: width,
+              height: height
+            },
+            inner: {
+            }
+          },
           login: { 
             position: 'absolute',
             top: (height - 200) / 2,

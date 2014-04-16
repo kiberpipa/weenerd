@@ -120,6 +120,47 @@ define([
       });
     },
 
+    handleOnConnect: function() {
+      var self = this,
+          opened = Cookie.getItem('opened'),
+          active = Cookie.getItem('active'),
+          state = {};
+
+      // on every socket connect set to initial state
+      state = self.getInitialState();
+      if (opened) {
+        state.opened = opened.split(',').filter(function(buffer) {
+          return Object.keys(self.state.buffers).indexOf(buffer) !== -1;
+        });
+      }
+      if (active && Object.keys(self.state.buffers).indexOf(active) !== -1) {
+        state.active = active;
+      }
+      self.setState(state);
+
+      // get all buffers 
+      self.fetchBuffers(undefined, function() {
+
+        // open buffers from cookie
+        state = { connected: true };
+
+        if (opened) {
+          state.opened = opened.split(',').filter(function(buffer) {
+            return Object.keys(self.state.buffers).indexOf(buffer) !== -1;
+          });
+        }
+
+        if (active && Object.keys(self.state.buffers).indexOf(active) !== -1) {
+          state.active = active;
+        }
+
+        if (Object.keys(state).length !== 0) {
+          self.setState(state);
+        }
+
+      });
+    },
+
     componentDidMount: function() {
       var self = this;
 
@@ -127,6 +168,9 @@ define([
 
       self.socket.on('relay:error', function (error) {
         console.log('ERROR: ' + error.code + ' - ' + error.message);
+        if (error.code === 'EPIPE') {
+          self.setState({ connected: false });
+        }
       });
 
       // listen to all (non error) events from relay
@@ -182,51 +226,17 @@ define([
       });
 
       self.socket.on('relay:connected', function () {
-
-        var opened = Cookie.getItem('opened'),
-            active = Cookie.getItem('active'),
-            state = {};
-
-        // on every socket connect set to initial state
-        state = self.getInitialState();
-        if (opened) {
-          state.opened = opened.split(',').filter(function(buffer) {
-            return Object.keys(self.state.buffers).indexOf(buffer) !== -1;
-          });
-        }
-        if (active && Object.keys(self.state.buffers).indexOf(active) !== -1) {
-          state.active = active;
-        }
-        self.setState(state);
-
-        // get all buffers 
-        self.fetchBuffers(undefined, function() {
-
-          // open buffers from cookie
-          state = {};
-
-          if (opened) {
-            state.opened = opened.split(',').filter(function(buffer) {
-              return Object.keys(self.state.buffers).indexOf(buffer) !== -1;
-            });
-          }
-
-          if (active && Object.keys(self.state.buffers).indexOf(active) !== -1) {
-            state.active = active;
-          }
-
-          if (Object.keys(state).length !== 0) {
-            self.setState(state);
-          }
-
-        });
-
+        self.handleOnConnect();
       });
 
       // we gracefully handle disconnect
       self.socket.on('disconnect', function () {
+        self.setState({ connected: false });
         console.log('Socket is disconnected.');
       });
+
+
+      self.socket.emit('client:initialized');
 
     },
 
@@ -280,7 +290,26 @@ define([
     },
 
     render: function() {
-      var self = this;
+      var self = this,
+          connecting = this.props.layout.connecting || {};
+
+      if (self.state.connected === false) {
+        return (
+          React.DOM.div({ style: connecting.outer || {}},
+            React.DOM.div({ style: connecting.inner || {}}, [
+              React.DOM.div({ style: { textAlign: 'center' } }, 'Connecting ...'),
+              React.DOM.div({ className: 'progress progress-striped active' },
+                React.DOM.div({ className: 'progress-bar', role: 'progressbar',
+                                ariaValuenow: '100', ariaValuemin: '0',
+                                ariaValuemax: '100', style: { width: '100%' }},
+                  React.DOM.span({ className: 'sr-only'}, 'Loading...')
+                )
+              )
+            ])
+          )
+        );
+      }
+
       return (
         React.DOM.div({}, [
           Dashboard({
