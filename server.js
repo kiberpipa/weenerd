@@ -186,26 +186,6 @@ io.sockets.on('connection', function(socket) {
                       argv['relay-host'] + ':' +
                       argv['relay-port'] + '!');
 
-          relay.on(function() {
-            // emit notifications for private chat and nick highlight
-            // handle server-side state what notifications are pending
-            ensureArray(arguments[0]).forEach(function(event) {
-                if (event.highlight === 1 || (event.tags_array && event.tags_array.indexOf("notify_private") > -1)) {
-                    var shasum = crypto.createHash('sha1');
-                    shasum.update(JSON.stringify(event));
-                    var hash = shasum.digest('hex'),
-                        notification = {
-                            hash: hash,
-                            event: event
-                        };
-                    unreadNotifications.push(notification);
-                    socket.emit('notifications', [notification]);
-                }
-            });
-            
-            socket.emit('relay:events', arguments); 
-          });
-
           relay.on('error', function(error) {
             console.log('RELAY: ' + error.code + ' - ' + error.message);
             if (error.code === 'EPIPE') {
@@ -229,6 +209,26 @@ io.sockets.on('connection', function(socket) {
          socket.emit('notifications', unreadNotifications);
       }
     }
+    
+    relay.on(function() {
+      socket.emit('relay:events', arguments); 
+      
+      // emit notifications for private chat and nick highlight
+      // handle server-side state what notifications are pending
+      ensureArray(arguments[0]).forEach(function(event) {
+          if (event.highlight === 1 || (event.tags_array && event.tags_array.indexOf("notify_private") > -1)) {
+              var shasum = crypto.createHash('sha1');
+              shasum.update(JSON.stringify(event));
+              var hash = shasum.digest('hex'),
+                  notification = {
+                      hash: hash,
+                      event: event
+                  };
+              unreadNotifications.push(notification);
+              socket.emit('notifications', [notification]);
+          }
+      });
+    });
   });
   
   socket.on('notification:markread', function(args, cb) {
