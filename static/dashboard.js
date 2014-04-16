@@ -17,6 +17,14 @@ define([
             return n.event.buffer === uid;
         }).length;
     },
+    
+    sortBuffers: function(buffers) {
+        return Object.keys(buffers).map(function(uid) {
+            return buffers[uid];
+        }).sort(function(a, b) {
+            return a.info.short_name.localeCompare( b.info.short_name);
+        });
+    },
 
     render: function() {
       var self = this;
@@ -39,8 +47,8 @@ define([
                          React.DOM.button({className: "btn btn-default btn-lg", disabled: "disabled", title: "Help"},
                                            React.DOM.span({ className: "glyphicon glyphicon-question-sign"})), 
                      ]))
-                 ].concat(Object.keys(self.props.buffers).map(function(uid) {
-                   var buffer = self.props.buffers[uid];
+                 ].concat(self.sortBuffers(self.props.buffers).map(function(buffer) {
+                   var uid = buffer.info.pointers[0];
                    return React.DOM.tr({ key: uid },
                             React.DOM.td({},
                               React.DOM.a({href: "#",
