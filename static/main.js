@@ -1,6 +1,6 @@
 requirejs.config({
   paths: {
-    'domready': '/static/lib/domready',
+    'domready': '/static/lib/ready',
     'react' : '/static/lib/react/react-with-addons',
     'react-async' : '/static/lib/react/react-async',
     'moment' : '/static/lib/moment',

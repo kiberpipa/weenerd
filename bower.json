@@ -1,0 +1,35 @@
+{
+  "name": "weenerd",
+  "version": "0.0.1",
+  "homepage": "https://github.com/kiberpipa/weenerd",
+  "authors": [
+    "Domen Kozar <domen@dev.si>",
+    "Rok Garbas <rok@garbas.si>"
+  ],
+  "description": "weenerd, because fuck M0nd4y!",
+  "main": "src/main.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "weechat",
+    "irc",
+    "moday",
+    "fuck"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "3.1.1",
+    "domready": "1.0.4",
+    "moment": "2.6.0",
+    "react": "0.10.0",
+    "react-async": "0.9.1",
+    "react-router-component": "0.18.2",
+    "requirejs": "2.1.11"
+  }
+}

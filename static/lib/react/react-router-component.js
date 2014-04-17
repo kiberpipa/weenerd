@@ -526,6 +526,7 @@ var RouterMixin = {
    * Navigate to a path
    *
    * @param {String} path
+   * @param {Function} navigation
    * @param {Callback} cb
    */
   navigate: function(path, navigation, cb) {
@@ -546,7 +547,7 @@ var RouterMixin = {
    * @private
    *
    * @param {String} path
-   * @param {String} path
+   * @param {Function} navigation
    * @param {Callback} cb
    */
   setPath: function(path, navigation, cb) {
@@ -872,7 +873,8 @@ if (ExecutionEnvironment.canUseDOM) {
 
   pathnameEnvironment = new PathnameEnvironment();
   hashEnvironment     = new HashEnvironment();
-  defaultEnvironment  = (window.history !== undefined) ?
+  defaultEnvironment  = (window.history !== undefined &&
+                         window.history.pushState !== undefined) ?
                         pathnameEnvironment :
                         hashEnvironment;
 
@@ -906,7 +908,7 @@ var mergeInto = (window.__ReactShim.mergeInto);
 var invariant = (window.__ReactShim.invariant);
 
 /**
- * Match rotues against a path
+ * Match routes against a path
  *
  * @param {Array.<Route>} routes
  * @param {String} path
