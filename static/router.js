@@ -126,7 +126,8 @@ define([
             left: 0,
             width: 200,
             height: height,
-            padding: 0
+            padding: 0,
+            overflowY: 'auto'
           },
           buffer: {
             overflowX: 'hidden',
