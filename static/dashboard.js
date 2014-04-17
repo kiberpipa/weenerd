@@ -50,7 +50,7 @@ define([
                  ].concat(self.sortBuffers(self.props.buffers).map(function(buffer) {
                    var uid = buffer.info.pointers[0];
                    return React.DOM.tr({ key: uid },
-                            React.DOM.td({},
+                            React.DOM.td({className: (uid == self.props.activeBufferUID ? "active" : "")},
                               React.DOM.a({href: "#",
                                            className: 'dashboard-buffer',
                                            onClick: function(e) {

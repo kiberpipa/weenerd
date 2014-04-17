@@ -9,6 +9,7 @@ define([
       // - caseinsensitive autocomplete by nickname list (tab to advance, shift-tab to reverse)
       // TODO: - autocomplete irc commands
       // TODO: use filter function to implement cycling of nicknames on autocompletion
+      // TODO: autocomplete sort should obey history of the channel as the list of nicknames
       
     displayName: 'App',
 

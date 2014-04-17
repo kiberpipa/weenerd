@@ -388,6 +388,7 @@ define([
           Dashboard({
             key: 'dashboard',
             buffers: self.state.buffers,
+            activeBufferUID: self.state.active,
             openBuffer: self.openBuffer,
             closeBuffer: self.closeBuffer,
             notifications: self.state.notifications,
