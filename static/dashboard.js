@@ -33,7 +33,7 @@ define([
                React.DOM.table({className: "table"}, React.DOM.tbody({},
                  [
                      React.DOM.tr({key: "actions", id: "dashboard-actions"}, React.DOM.td({className: "btn-group"}, [
-                         React.DOM.button({className: "btn btn-default btn-lg",
+                         React.DOM.button({className: "btn btn-default btn-lg" + (self.props.notifications.length > 0 ? "" : " disabled"),
                                            id: "notifications",
                                            title: "Mark notifications as read",
                                            onClick: self.clickNotifications},
