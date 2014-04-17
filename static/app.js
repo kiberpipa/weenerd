@@ -124,7 +124,13 @@ define([
     
     markNotificationsAsRead: function(notifications) {
        this.socket.emit('notification:markread', {notifications: notifications}); 
-       this.setState({notifications: []});
+       
+       // filter notifications by hash
+       this.setState({
+           notifications: this.state.notifications.filter(function (notification) {
+              return notifications.map(function (n){ return n.hash;}).indexOf(notification.hash) === -1;
+           })
+       });
     },
 
     handleOnConnect: function() {
