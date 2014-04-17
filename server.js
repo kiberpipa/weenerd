@@ -112,7 +112,7 @@ app
       '  <title>' + argv.title + '</title>' +
       '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />' +
       '  <link type="text/css" rel="stylesheet" href="/static/lib/bootstrap/css/bootstrap.min.css">' +
-      '  <link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAHDgAADw8AAA+fAAAPnwAAD58AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA48cAAMGDAACBgQAAgAEAAIABAAAAAAAAAYAAAD/8AACX6QAAw8MAAOfvAAD//wAA" rel="icon" type="image/png" />' +
+      '  <link href="/static/favicon.png" rel="icon" type="image/png" />' +
       '  <link type="text/css" rel="stylesheet" href="/static/main.css">' +
       ' </head>' +
       ' <body>' + content +

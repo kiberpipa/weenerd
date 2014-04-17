@@ -200,7 +200,7 @@ define([
               notifications.forEach(function (notification) {
                 var n = new window.Notification(Color.format(self.state.buffers[notification.event.buffer].info.short_name), {
                     body: Color.format(notification.event.prefix + " " + notification.event.message),
-                    icon: "http://www.favicon.cc/logo3d/449619.png"
+                    icon: "/static/favicon.png"
                 });
                 
                 n.onclick = function(x) { 
