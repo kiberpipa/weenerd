@@ -67,7 +67,8 @@ define([
           ]),
           NicknameList({
             nicklist: this.props.buffer.nicklist,
-            layout: this.props.layout
+            layout: this.props.layout,
+            sendInput: this.props.sendInputConstructor(this.props.buffer.info.pointers[0])
           })
         ]);
     }
