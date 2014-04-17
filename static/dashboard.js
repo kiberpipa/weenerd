@@ -9,7 +9,7 @@ define([
     displayName: 'Dashboard',
     
     clickNotifications: function () {
-        this.props.markNotificationsAsRead(this.props.notifications.map(function (n) { return n.hash; }));
+        this.props.markNotificationsAsRead(this.props.notifications);
     },
     
     numNotificationsForBuffer: function(uid) {

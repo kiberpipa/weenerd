@@ -10,8 +10,9 @@ var ensureArray = function (maybeArray) {
   }
 };
 
-// array of notifications that are unread
-var unreadNotifications = [];
+// array for in-memory tracking of notifications state
+var unreadNotifications = [],
+    readNotifications = [];
 
 //
 // --- CLI ---
@@ -224,17 +225,21 @@ io.sockets.on('connection', function(socket) {
                       hash: hash,
                       event: event
                   };
-              unreadNotifications.push(notification);
-              socket.emit('notifications', [notification]);
+                  
+              if (readNotifications.indexOf(hash) === -1) {
+                  unreadNotifications.push(notification);
+                  socket.emit('notifications', [notification]);
+              }
           }
       });
     });
   });
   
-  socket.on('notification:markread', function(args, cb) {
+  socket.on('notifications:markread', function(args, cb) {
       unreadNotifications = unreadNotifications.filter(function (notification) {
           return args.notifications.indexOf(notification.hash) === -1;
       });
+      readNotifications = readNotifications.concat(args.notifications);
   });
 
   //

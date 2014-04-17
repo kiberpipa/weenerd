@@ -122,15 +122,20 @@ define([
       });
     },
     
+    // marks an array notifications as read or all of them
     markNotificationsAsRead: function(notifications) {
-       this.socket.emit('notification:markread', {notifications: notifications}); 
-       
        // filter notifications by hash
+       console.log("marking");
+       var notificationsHahes = notifications.map(function (n){ return n.hash;});
+       
+       this.socket.emit('notifications:markread', {notifications: notificationsHahes}); 
+       
        this.setState({
-           notifications: this.state.notifications.filter(function (notification) {
-              return notifications.map(function (n){ return n.hash;}).indexOf(notification.hash) === -1;
-           })
+         notifications: this.state.notifications.filter(function (notification) {
+          return notificationsHahes.indexOf(notification.hash) === -1;
+         })
        });
+      
     },
 
     handleOnConnect: function() {
@@ -188,7 +193,8 @@ define([
       
       self.socket.on('notifications', function(notifications) {
           // ignore notifications for active buffer
-          // TODO: we shouldn't ignore if tab is not focused
+          // TODO: we shouldn't ignore if tab window is not focused
+          // TODO: mark them as read also on server
           notifications = notifications.filter(function (n) { 
               return n.event.buffer != self.state.active;
           });
