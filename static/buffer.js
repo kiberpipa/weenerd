@@ -47,6 +47,7 @@ define([
                           className: 'buffer-messages',
                           style: this.props.layout.buffer || {}},
                buffer.messages.map(function (message) {
+                 if (message.displayed === 1) {
                    return React.DOM.li({className: "list-group-item row" + (message.highlight === 1 ? " list-group-item-info" : ""),
                                         key: message.pointers.join(" ")}, [
                        React.DOM.div({className: "col-xs-6 col-sm-1 message-date text-muted", key: "date"},
@@ -59,6 +60,7 @@ define([
                                       dangerouslySetInnerHTML: {__html: Color.format(message.message)}}
                        )
                    ]);
+                 }
                })
             ),
             InputBox({nicklist: this.props.buffer.nicklist,
