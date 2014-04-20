@@ -21,13 +21,13 @@ define([
 
     // see http://blog.vjeux.com/2013/javascript/scroll-position-with-react.html
     componentWillUpdate: function() {
-      var node = this.getDOMNode().getElementsByClassName('buffer-messages')[0];
-      this.shouldScrollBottom = node.scrollTop + node.offsetHeight === node.scrollHeight;
+      var node = this.refs.scrollable.getDOMNode();
+      this.shouldScrollBottom = (node.scrollTop + node.offsetHeight) >= node.scrollHeight;
     },
     
     componentDidUpdate: function() {
       if (this.shouldScrollBottom) {
-        var node = this.getDOMNode().getElementsByClassName('buffer-messages')[0];
+        var node = this.refs.scrollable.getDOMNode();
         node.scrollTop = node.scrollHeight;
       }
     },
@@ -44,6 +44,7 @@ define([
                           style: this.props.layout.bufferTitle || {},
                           dangerouslySetInnerHTML: {__html: Color.format(name + ": " + buffer.info.title)}}),
             React.DOM.ul({key: "listgroup",
+                          ref: "scrollable",
                           className: 'buffer-messages',
                           style: this.props.layout.buffer || {}},
                buffer.messages.map(function (message) {
