@@ -13,7 +13,7 @@
     "chat",
     "irc"
   ],
-  "author": "Rok Garbas",
+  "author": "Rok Garbas, Domen Kožar",
   "license": "MIT",
   "homepage": "https://github.com/garbas/weecloud-react",
   "bugs": {
