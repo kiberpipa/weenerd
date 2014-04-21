@@ -15,8 +15,8 @@ Features:
 
 Install:
 
- - On weechat: /set relay.network.password <pass>
- - On weechat: /relay add weechat <port>
+ - On weechat: /set relay.network.password foobar
+ - On weechat: /relay add weechat 8001
  - $ git clone https://github.com/kiberpipa/weenerd.git
  - $ npm install
- - $ node server.js --relay-host localhost --relay-port <port> --relay-password <pass>
+ - $ node server.js --relay-host localhost --relay-port 8001 --relay-password foobar
