@@ -5,7 +5,7 @@ An attempt to build WeeChat Relay Client using:
  - SocketIO: http://socket.io
  - React: http://facebook.github.io/react
 
-Features:
+# Features
 
  - responsive design (WIP)
  - notifications when somebody pings you on privmsg or channel
@@ -13,13 +13,17 @@ Features:
  - autocomplete nicknames
  - resolve https(s) links in chat
 
-Install:
+# Install
 
  - On weechat: /set relay.network.password foobar
  - On weechat: /relay add weechat 8001
  - $ git clone https://github.com/kiberpipa/weenerd.git
  - $ npm install
  - $ node server.js --relay-host localhost --relay-port 8001 --relay-password foobar
+
+# Screenshots
+
+![Screenshot 1](http://i.imgur.com/ss3lklU.png)
 
 
 [![Support via Gittip](https://rawgithub.com/twolfson/gittip-badge/0.2.0/dist/gittip.png)](https://www.gittip.com/Kiberpipa/)
