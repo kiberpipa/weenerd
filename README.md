@@ -1,4 +1,6 @@
-An attempt to build WeeChat Relay Client using:
+An attempt to build WeeChat Relay Client in one Monday (which got extended over ~three days).
+
+# Technologies
 
  - Node: http://nodejs.org
  - Connect/Express: http://www.senchalabs.org/connect
