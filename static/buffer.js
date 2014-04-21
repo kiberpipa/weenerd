@@ -52,7 +52,7 @@ define([
                    return React.DOM.li({className: "list-group-item row" + (message.highlight === 1 ? " list-group-item-info" : ""),
                                         key: message.pointers.join(" ")}, [
                        React.DOM.div({className: "col-xs-6 col-sm-1 message-date text-muted", key: "date"},
-                                     moment.unix(message.date).format('hh:mm:ss')),
+                                     moment.unix(message.date).format('H:mm:ss')),
                        React.DOM.div({className: "col-xs-6 col-sm-2 message-prefix " + (message.tags_array.indexOf("irc_privmsg") === -1 ? "text-muted" : "text-primary"),
                                       key: "prefix",
                                       dangerouslySetInnerHTML: {__html: Color.format(message.prefix)}}),
