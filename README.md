@@ -9,7 +9,7 @@ An attempt to build WeeChat Relay Client using:
 
  - responsive design (WIP)
  - notifications when somebody pings you on privmsg or channel
- - searchable channel list
+ - searchable channel list (WIP)
  - autocomplete nicknames
  - resolve https(s) links in chat
 
