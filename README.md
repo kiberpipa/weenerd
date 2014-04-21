@@ -20,3 +20,6 @@ Install:
  - $ git clone https://github.com/kiberpipa/weenerd.git
  - $ npm install
  - $ node server.js --relay-host localhost --relay-port 8001 --relay-password foobar
+
+
+[![Support via Gittip](https://rawgithub.com/twolfson/gittip-badge/0.2.0/dist/gittip.png)](https://www.gittip.com/Kiberpipa/)
